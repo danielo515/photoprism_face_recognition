@@ -1,63 +1,26 @@
 from db_setup.create_tables import create_tables
-from PIL import Image
+import sys
+from datetime import datetime
 import numpy as np
-import requests
 import face_recognition
-import os
-import pickle
 import db_setup
 import configparser
-
-api = ""
-
-
-def save_cookies(session, filename):
-    with open(filename, 'wb') as f:
-        f.truncate()
-        pickle.dump(session.cookies, f)
-        print('Saved cookies to file')
+import api
 
 
-def load_cookies(session, filename):
-    if not os.path.isfile(filename):
-        print('cookie file was not found')
-        return False
-    with open(filename, 'rb') as f:
-        cookies = pickle.load(f)
-        print('Loaded cookies from file')
-        if cookies:
-            session.cookies.update(cookies)
-            print('Injected cookies')
-            return True
-        else:
-            return False
-
-
-def login(username, password):
-    cookie_file = 'photoprism_cookies'
-    s = requests.Session()
-    if load_cookies(session=s, filename=cookie_file):
-        return s
-    s.auth = (username, password)
-    s.post("{api}/session".format(api=api), data=dict(username=username, password=password))
-    save_cookies(session=s, filename=cookie_file)
-    return s
-
-
-def fetch_photo(session, hash):
-    url = "{api}/t/{hash}/public/tile_224".format(api=api, hash=hash)
-    response = session.get(url, stream=True)
-    response.raw.decode_content = True
-    img = Image.open(response.raw)
-    return img
-
-
-def pic_from_queue(cursor, process, batch_size=5):
-    query = "select file_hash from photo_queue where checked = False limit %s"
-    cursor.execute(query, (batch_size,))
+def pic_from_queue(cursor, process, batch_size=5, skip=0):
+    query = """
+    select file_hash from photo_queue 
+    where checked = False LIMIT %s OFFSET %s
+    """
+    cursor.execute(query, (batch_size, skip))
+    time_start = datetime.now()
     for hash, in cursor:
         process(hash)
-    print("Processed {} photos in queue".format(cursor.rowcount))
+    print("Processed {} photos in queue in {} time".format(
+        cursor.rowcount,
+        datetime.now() - time_start)
+    )
 
 # =========== Face recognition section =============================
 
@@ -74,28 +37,29 @@ def find_faces(image_to_check, image_name, model, upsample):
     return face_locations
 
 
-def process(session):
+def process(api):
     def _process(hash):
-        photo = fetch_photo(session, hash=hash)
+        photo = api.fetch_photo(hash=hash)
         faces_found = find_faces(np.array(photo), image_name=hash, model="cnn", upsample=1)
         photo.save("output/0_{}_{}.jpg".format(len(faces_found), hash))
     return _process
 
 
-config = configparser.ConfigParser()
-config.read('./config.ini')
-db_config = dict(config['db_config'].items())
-photoprism_config = dict(config['photoprism'].items())
-host = photoprism_config.pop('host')
-api = "http://{host}/api/v1".format(host=host)
-print(photoprism_config)
+if __name__ == "__main__":
+    batch_size = int(sys.argv[1]) if sys.argv[1] else 5
+    print(sys.argv[1])
+    config = configparser.ConfigParser()
+    config.read('./config.ini')
+    db_config = dict(config['db_config'].items())
+    photoprism_config = dict(config['photoprism'].items())
+    host = photoprism_config.pop('host')
 
-(cnx, cursor) = db_setup.connect(**db_config)
-db_setup.create_tables(cursor=cursor)
+    (cnx, cursor) = db_setup.connect(**db_config)
+    db_setup.create_tables(cursor=cursor)
+    pic_from_queue(
+        cursor=cursor,
+        process=process(api.Api(host)),
+        batch_size=batch_size, skip=50)
 
-session = login(**photoprism_config)
-pic_from_queue(cursor=cursor, process=process(session), batch_size=50)
-
-
-cursor.close()
-cnx.close()
+    cursor.close()
+    cnx.close()
