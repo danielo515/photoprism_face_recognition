@@ -4,11 +4,12 @@ from mysql.connector import errorcode
 
 
 def create_faces_table():
-    rows = [" TERM_{} float".format(n) for n in range(128)]
+    rows = [" TERM_{} DOUBLE".format(n) for n in range(128)]
     query = '''
         create table if not exists faces (
             id bigint auto_increment primary key,
             photo_id int(10) unsigned not null,
+            locations JSON not null,
             {rows},
             FOREIGN KEY fk (photo_id) REFERENCES photos (id) ON UPDATE RESTRICT
         ) ENGINE = InnoDB;

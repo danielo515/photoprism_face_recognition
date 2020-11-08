@@ -1,3 +1,6 @@
+from jinja2 import Template
+import json
+from face_recognition.api import face_locations
 from db_setup.create_tables import create_tables
 import sys
 from datetime import datetime
@@ -10,13 +13,13 @@ import api
 
 def pic_from_queue(cursor, process, batch_size=5, skip=0):
     query = """
-    select file_hash from photo_queue 
-    where checked = False LIMIT %s OFFSET %s
+    SELECT photo_id, file_hash FROM photo_queue 
+    WHERE checked = False LIMIT %s OFFSET %s
     """
     cursor.execute(query, (batch_size, skip))
     time_start = datetime.now()
-    for hash, in cursor:
-        process(hash)
+    for (photo_id, hash) in cursor:
+        process(hash=hash, photo_id=photo_id)
     print("Processed {} photos in queue in {} time".format(
         cursor.rowcount,
         datetime.now() - time_start)
@@ -30,18 +33,54 @@ def print_result(filename, location):
     print("{},{},{},{},{}".format(filename, top, right, bottom, left))
 
 
+encoding_columns = ["TERM_{} ".format(i) for i in range(128)]
+
+save_query = Template("""
+INSERT INTO faces 
+(photo_id, locations, {{ encoding_columns | join(',') }})
+VALUES (%s, %s, {% for i in range(127) %} %s, {% endfor %} %s)
+""").render(encoding_columns=encoding_columns)
+
+print(save_query)
+
+
+def save_faces(image_id, encodings, locations, cursor):
+    for (encoding, location) in zip(encodings, locations):
+        cursor.execute(save_query, (image_id, json.dumps(location)) + tuple(encoding))
+
+
+def get_encodings(image, faces_locations):
+    return [face_recognition.face_encodings(
+            image,
+            known_face_locations=locations)
+            for locations in faces_locations]
+
+
 def find_faces(image_to_check, image_name, model, upsample):
     face_locations = face_recognition.face_locations(image_to_check, number_of_times_to_upsample=upsample, model=model)
-    if len(face_locations) == 0:
-        print(image_name, " has no faces")
+    if len(face_locations) > 0:
+        print(image_name, " has {} faces".format(len(face_locations)))
     return face_locations
 
 
-def process(api):
-    def _process(hash):
+def process(api, cursor):
+    def _process(hash, photo_id):
         photo = api.fetch_photo(hash=hash)
-        faces_found = find_faces(np.array(photo), image_name=hash, model="cnn", upsample=1)
-        photo.save("output/0_{}_{}.jpg".format(len(faces_found), hash))
+        photo_arr = np.array(photo)
+        faces_found = find_faces(
+            photo_arr,
+            image_name=hash,
+            model="cnn",
+            upsample=1)
+        if(len(faces_found) > 0):
+            faces_encodings = face_recognition.face_encodings(
+                photo_arr, known_face_locations=faces_found
+            )
+            save_faces(
+                image_id=photo_id, encodings=faces_encodings, locations=faces_found,
+                cursor=cursor
+            )
+            photo.save("output/0_{}_{}.jpg".format(len(faces_found), hash))
     return _process
 
 
@@ -58,8 +97,8 @@ if __name__ == "__main__":
     db_setup.create_tables(cursor=cursor)
     pic_from_queue(
         cursor=cursor,
-        process=process(api.Api(host)),
+        process=process(api.Api(host), cursor=cursor),
         batch_size=batch_size, skip=50)
-
+    cnx.commit()
     cursor.close()
     cnx.close()
