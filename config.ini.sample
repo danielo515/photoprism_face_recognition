@@ -1,0 +1,8 @@
+[db_config] 
+user= photoprism
+password= password123
+host= localhost
+[photoprism] 
+username= admin
+password= please-change
+host=192.168.0.100:2342
