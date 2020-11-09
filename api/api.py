@@ -49,6 +49,5 @@ class Api:
             img = Image.open(response.raw)
         except UnidentifiedImageError as error:
             print("Error during fetching image {} ".format(hash), error)
-            print(response)
             return None
         return img

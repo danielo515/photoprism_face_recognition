@@ -75,8 +75,8 @@ def get_encodings(image, faces_locations):
 
 def find_faces(image_to_check, image_name, model, upsample):
     face_locations = face_recognition.face_locations(image_to_check, number_of_times_to_upsample=upsample, model=model)
-    if len(face_locations) > 0:
-        print(image_name, " has {} faces".format(len(face_locations)))
+    # if len(face_locations) > 0:
+    #     print(image_name, " has {} faces".format(len(face_locations)))
     return face_locations
 
 

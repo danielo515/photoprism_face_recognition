@@ -18,10 +18,13 @@ def create_faces_table():
 
 
 def create_photo_queue_table():
+    "File type is BINARY that is the representation of JPEG"
     query = '''
     create table if not exists photo_queue (
         checked boolean default false
-        ) ENGINE = InnoDB SELECT photo_id, file_hash from files;
+        ) ENGINE = InnoDB 
+        SELECT photo_id, file_hash from files
+        WHERE file_type IN (0x6A7067)
         '''
     return query
 
