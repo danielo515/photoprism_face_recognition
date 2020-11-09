@@ -51,7 +51,7 @@ def connect(*, user, password, host):
         else:
             print(err)
     else:
-        return (cnx, cnx.cursor())
+        return (cnx, cnx.cursor(buffered=True))
 
 
 def create_tables(cursor):

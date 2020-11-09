@@ -1,6 +1,6 @@
 import os
 import pickle
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 import requests
 
 
@@ -45,5 +45,10 @@ class Api:
         url = "{api}/t/{hash}/public/tile_224".format(api=self.api, hash=hash)
         response = self.session.get(url, stream=True)
         response.raw.decode_content = True
-        img = Image.open(response.raw)
+        try:
+            img = Image.open(response.raw)
+        except UnidentifiedImageError as error:
+            print("Error during fetching image {} ".format(hash), error)
+            print(response)
+            return None
         return img
