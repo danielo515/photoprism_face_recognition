@@ -27,6 +27,14 @@
         color: white;
         font-size: 12px;
       }
+      .info {
+        position: absolute;
+        bottom: 0px;
+        left: 8px;
+        height: 16px;
+        font-size: 12px;
+        color: white;
+      }
       .crop:hover > .face-square {
         opacity: 1;
       }
@@ -47,7 +55,7 @@
   </head>
   <body>
     <main class="grid-container">
-      {% for (url, (top, right, bottom, left), distance) in images %}
+      {% for (url, (top, right, bottom, left), distance, face_id) in images %}
       <div class="shape">
         <div
           class="crop"
@@ -63,6 +71,7 @@
           >
             {{distance}}
           </div>
+          <div class="info">face id:{{ face_id }}</div>
         </div>
       </div>
       {% endfor %}

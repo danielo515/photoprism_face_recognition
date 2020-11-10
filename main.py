@@ -190,8 +190,8 @@ def lookup_faces_cmd():
     _api = api.Api(conf['host'])
     print("Found {} faces".format(len(results)))
     images = [
-        (_api.get_img_url(hash=hash), json.loads(locations), distance)
-        for (_, locations, hash, distance) in results
+        (_api.get_img_url(hash=hash), json.loads(locations), distance, id)
+        for (id, locations, hash, distance) in results
     ]
     with open('results.html', 'w') as f:
         rendered = Template(open('./templates/faces.jinja.html').read()).render(images=images)
