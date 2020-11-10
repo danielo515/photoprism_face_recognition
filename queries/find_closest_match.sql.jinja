@@ -1,8 +1,14 @@
-SELECT  id, photo_id from faces 
-ORDER BY 
-    sqrt(
-        {% for i, term in encodings -%}
-        power(TERM_{{ i }} - ({{ term }}), 2) + 
-        {% endfor -%}
-    0)
-LIMIT 3
+{% macro euclidea_distance() %}
+sqrt(
+    {% for i, term in encodings -%}
+    power(TERM_{{ i }} - ({{ term }}), 2) + 
+    {% endfor -%}
+0)
+{% endmacro %}
+SELECT  f.id, e.photo_id, e.file_hash, {{ euclidea_distance() }} as distance 
+FROM faces f
+LEFT JOIN files e
+ON f.photo_id = e.photo_id
+HAVING distance < 0.5
+ORDER BY distance
+LIMIT 30

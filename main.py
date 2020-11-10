@@ -146,5 +146,9 @@ def main():
 if __name__ == "__main__":
     conf = read_config()
     (cnx, cursor) = db_setup.connect(**conf['db_config'])
-    results = find_closest_match_by_id(face_id=55, cursor=cursor)
-    print(results)
+    results = find_closest_match_by_id(face_id=189, cursor=cursor)
+    api = api.Api(conf['host'])
+    print("Found {} faces".format(len(results)))
+    for (_, _, hash, confidence) in results:
+        photo = api.fetch_photo(hash=hash)
+        photo.show()
