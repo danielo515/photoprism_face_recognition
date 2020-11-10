@@ -164,18 +164,18 @@ def read_config():
 def main():
     batch_size = int(sys.argv[1]) if len(sys.argv) > 1 else 5
     conf = read_config()
-    (cnx, cursor) = db_setup.connect(**conf.db_config)
+    (cnx, cursor) = db_setup.connect(**conf['db_config'])
     db_setup.create_tables(cursor=cursor)
     pic_from_queue(
         cnx=cnx,
-        process=process(api.Api(conf.host), cursor=cursor),
+        process=process(api.Api(conf['host']), cursor=cursor),
         batch_size=batch_size, skip=50)
     cnx.commit()
     cursor.close()
     cnx.close()
 
 
-if __name__ == "__main__":
+def lookup_faces_cmd():
     if (len(sys.argv) < 2):
         print('Please provide a face id')
         exit(1)
@@ -183,10 +183,15 @@ if __name__ == "__main__":
     conf = read_config()
     (cnx, cursor) = db_setup.connect(**conf['db_config'])
     results = find_closest_match_by_id(face_id=face_id, cursor=cursor)
-    api = api.Api(conf['host'])
+    _api = api.Api(conf['host'])
     print("Found {} faces".format(len(results)))
     for (_, locations, hash, confidence) in results:
-        photo = api.fetch_photo(hash=hash)
+        photo = _api.fetch_photo(hash=hash)
         show_prediction_labels_on_image(
             img=photo, predictions=[(str(confidence), json.loads(locations))]
         )
+
+
+if __name__ == "__main__":
+    # main()
+    lookup_faces_cmd()
