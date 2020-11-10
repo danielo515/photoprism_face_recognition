@@ -1,4 +1,5 @@
 from jinja2 import Template
+from PIL import Image, ImageDraw
 import json
 from face_recognition.api import face_encodings, face_locations
 from db_setup.create_tables import create_tables
@@ -115,6 +116,37 @@ def find_closest_match_in_db(*, face_encodings, cursor):
     return cursor.fetchall()
 
 
+def show_prediction_labels_on_image(img, predictions):
+    """
+    Shows the face recognition results visually.
+
+    :param img an already loaded image 
+    :param predictions: array of label, positions tuples
+    :return:
+    """
+    pil_image = img.convert("RGB")
+    draw = ImageDraw.Draw(pil_image)
+
+    for confidence, (top, right, bottom, left) in predictions:
+        # Draw a box around the face using the Pillow module
+        draw.rectangle(((left, top), (right, bottom)), outline=(0, 0, 255))
+
+        # There's a bug in Pillow where it blows up with non-UTF-8 text
+        # when using the default bitmap font
+        confidence = confidence.encode("UTF-8")
+
+        # Draw a label with a name below the face
+        text_width, text_height = draw.textsize(confidence)
+        draw.rectangle(((left, bottom - text_height - 10), (right, bottom)), fill=(0, 0, 255), outline=(0, 0, 255))
+        draw.text((left + 6, bottom - text_height - 5), confidence, fill=(255, 255, 255, 255))
+
+    # Remove the drawing library from memory as per the Pillow docs
+    del draw
+
+    # Display the resulting image
+    pil_image.show()
+
+
 def read_config():
     config = configparser.ConfigParser()
     config.read('./config.ini')
@@ -144,11 +176,17 @@ def main():
 
 
 if __name__ == "__main__":
+    if (len(sys.argv) < 2):
+        print('Please provide a face id')
+        exit(1)
+    face_id = int(sys.argv[1])
     conf = read_config()
     (cnx, cursor) = db_setup.connect(**conf['db_config'])
-    results = find_closest_match_by_id(face_id=189, cursor=cursor)
+    results = find_closest_match_by_id(face_id=face_id, cursor=cursor)
     api = api.Api(conf['host'])
     print("Found {} faces".format(len(results)))
-    for (_, _, hash, confidence) in results:
+    for (_, locations, hash, confidence) in results:
         photo = api.fetch_photo(hash=hash)
-        photo.show()
+        show_prediction_labels_on_image(
+            img=photo, predictions=[(str(confidence), json.loads(locations))]
+        )

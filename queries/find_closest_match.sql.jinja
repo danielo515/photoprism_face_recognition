@@ -5,7 +5,7 @@ sqrt(
     {% endfor -%}
 0)
 {% endmacro %}
-SELECT  f.id, e.photo_id, e.file_hash, {{ euclidea_distance() }} as distance 
+SELECT  f.id, f.locations, e.file_hash, {{ euclidea_distance() }} as distance 
 FROM faces f
 LEFT JOIN files e
 ON f.photo_id = e.photo_id
