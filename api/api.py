@@ -41,6 +41,9 @@ class Api:
         self.save_cookies(session=s, filename=cookie_file)
         return s
 
+    def get_img_url(self, hash):
+        return "{api}/t/{hash}/public/tile_224".format(api=self.api, hash=hash)
+
     def fetch_photo(self, hash):
         url = "{api}/t/{hash}/public/tile_224".format(api=self.api, hash=hash)
         response = self.session.get(url, stream=True)

@@ -67,3 +67,4 @@ target/
 # Project specific
 output/*
 config.ini
+results.html

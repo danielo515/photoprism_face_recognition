@@ -30,6 +30,7 @@ def pic_from_queue(cnx, process, batch_size=5, skip=0):
             process(hash=hash, photo_id=photo_id)
             # except:
             #     print("An error ocurred in batch {} processing {}".format(batch, photo_id))
+        print(cursor.rowcount)
         cnx.commit()
     print("Processed {} photos in queue in {} time".format(
         count,
@@ -89,7 +90,7 @@ def process(api, cursor):
             photo_arr,
             image_name=hash,
             model="cnn",
-            upsample=1)
+            upsample=0)
         if(len(faces_found) > 0):
             faces_encodings = face_recognition.face_encodings(photo_arr, known_face_locations=faces_found)
             save_faces(
@@ -185,11 +186,13 @@ def lookup_faces_cmd():
     results = find_closest_match_by_id(face_id=face_id, cursor=cursor)
     _api = api.Api(conf['host'])
     print("Found {} faces".format(len(results)))
-    for (_, locations, hash, confidence) in results:
-        photo = _api.fetch_photo(hash=hash)
-        show_prediction_labels_on_image(
-            img=photo, predictions=[(str(confidence), json.loads(locations))]
-        )
+    images = [
+        (_api.get_img_url(hash=hash), json.loads(locations))
+        for (_, locations, hash, confidence) in results
+    ]
+    with open('results.html', 'w') as f:
+        rendered = Template(open('./templates/faces.jinja.html').read()).render(images=images)
+        f.write(rendered)
 
 
 if __name__ == "__main__":
