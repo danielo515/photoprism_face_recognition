@@ -17,7 +17,7 @@
         overflow: hidden;
       }
 
-      .details {
+      .face-square {
         position: absolute;
         opacity: 0;
         background: rgba(0, 0, 0, 0.1);
@@ -25,8 +25,9 @@
         padding: 8px 16px;
         transition: all 0.2s;
         color: white;
+        font-size: 12px;
       }
-      .crop:hover > .details {
+      .crop:hover > .face-square {
         opacity: 1;
       }
 
@@ -46,7 +47,7 @@
   </head>
   <body>
     <main class="grid-container">
-      {% for (url, (top, right, bottom, left)) in images %}
+      {% for (url, (top, right, bottom, left), distance) in images %}
       <div class="shape">
         <div
           class="crop"
@@ -55,11 +56,13 @@
           "
         >
           <div
-            class="details"
+            class="face-square"
             style="
             top: {{ top }}px; left: {{ left }}px; 
             right: calc(224px - {{ right }}px); bottom: calc(224px - {{ bottom }}px);"
-          ></div>
+          >
+            {{distance}}
+          </div>
         </div>
       </div>
       {% endfor %}

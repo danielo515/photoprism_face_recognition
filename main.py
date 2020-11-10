@@ -10,6 +10,8 @@ import face_recognition
 import db_setup
 import configparser
 import api
+import os
+import webbrowser
 
 
 def pic_from_queue(cnx, process, batch_size=5, skip=0):
@@ -102,18 +104,18 @@ def process(api, cursor):
     return _process
 
 
-def find_closest_match_by_id(*, face_id, cursor):
+def find_closest_match_by_id(*, face_id, cursor, limit=50):
     template = Template(open('./queries/get_face_encodings.sql.jinja').read())
     query = template.render()
     cursor.execute(query, (face_id,))
     encodings = cursor.fetchall()[0]
-    return find_closest_match_in_db(face_encodings=encodings, cursor=cursor)
+    return find_closest_match_in_db(face_encodings=encodings, cursor=cursor, limit=limit)
 
 
-def find_closest_match_in_db(*, face_encodings, cursor):
+def find_closest_match_in_db(*, face_encodings, cursor, limit=50):
     template = Template(open('./queries/find_closest_match.sql.jinja').read())
     query = template.render(encodings=enumerate(face_encodings))
-    cursor.execute(query)
+    cursor.execute(query, {'limit': limit})
     return cursor.fetchall()
 
 
@@ -181,18 +183,20 @@ def lookup_faces_cmd():
         print('Please provide a face id')
         exit(1)
     face_id = int(sys.argv[1])
+    limit = int(sys.argv[2]) if len(sys.argv) > 2 else 50
     conf = read_config()
     (cnx, cursor) = db_setup.connect(**conf['db_config'])
-    results = find_closest_match_by_id(face_id=face_id, cursor=cursor)
+    results = find_closest_match_by_id(face_id=face_id, cursor=cursor, limit=limit)
     _api = api.Api(conf['host'])
     print("Found {} faces".format(len(results)))
     images = [
-        (_api.get_img_url(hash=hash), json.loads(locations))
-        for (_, locations, hash, confidence) in results
+        (_api.get_img_url(hash=hash), json.loads(locations), distance)
+        for (_, locations, hash, distance) in results
     ]
     with open('results.html', 'w') as f:
         rendered = Template(open('./templates/faces.jinja.html').read()).render(images=images)
         f.write(rendered)
+    webbrowser.open('file://{}'.format(os.path.realpath('./results.html')))
 
 
 if __name__ == "__main__":

@@ -11,4 +11,4 @@ LEFT JOIN files e
 ON f.photo_id = e.photo_id
 HAVING distance < 0.5
 ORDER BY distance
-LIMIT 30
+LIMIT %(limit)s
