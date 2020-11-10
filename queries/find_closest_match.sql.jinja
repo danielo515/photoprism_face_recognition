@@ -1,0 +1,8 @@
+SELECT  id, photo_id from faces 
+ORDER BY 
+    sqrt(
+        {% for i, term in encodings -%}
+        power(TERM_{{ i }} - ({{ term }}), 2) + 
+        {% endfor -%}
+    0)
+LIMIT 3

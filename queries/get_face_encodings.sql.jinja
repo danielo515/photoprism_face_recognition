@@ -1,0 +1,8 @@
+
+SELECT 
+{% for i in range(127) -%}
+TERM_{{i}},
+{% endfor -%}
+TERM_127
+FROM faces
+WHERE id = %s

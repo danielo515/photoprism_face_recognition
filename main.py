@@ -1,6 +1,6 @@
 from jinja2 import Template
 import json
-from face_recognition.api import face_locations
+from face_recognition.api import face_encodings, face_locations
 from db_setup.create_tables import create_tables
 import sys
 from datetime import datetime
@@ -38,11 +38,6 @@ def pic_from_queue(cnx, process, batch_size=5, skip=0):
 # =========== Face recognition section =============================
 
 
-def print_result(filename, location):
-    top, right, bottom, left = location
-    print("{},{},{},{},{}".format(filename, top, right, bottom, left))
-
-
 encoding_columns = ["TERM_{} ".format(i) for i in range(128)]
 
 save_query = Template("""
@@ -57,13 +52,13 @@ def save_faces(image_id, encodings, locations, cursor):
         cursor.execute(save_query, (image_id, json.dumps(location)) + tuple(encoding))
 
 
-def flag_photo_as_processed(photo_id, cursor):
+def flag_photo_as_processed(photo_id, cursor, face_count=0):
     # print("Flagging", photo_id)
     cursor.execute("""
     UPDATE photo_queue
-    SET checked = 1
+    SET checked = 1, face_count = %s
     WHERE photo_id = %s;
-    """, (photo_id, ))
+    """, (face_count, photo_id))
 
 
 def get_encodings(image, faces_locations):
@@ -83,42 +78,73 @@ def find_faces(image_to_check, image_name, model, upsample):
 def process(api, cursor):
     def _process(hash, photo_id):
         photo = api.fetch_photo(hash=hash)
-        if photo != None:
-            photo_arr = np.array(photo)
-            faces_found = find_faces(
-                photo_arr,
-                image_name=hash,
-                model="cnn",
-                upsample=1)
-            if(len(faces_found) > 0):
-                faces_encodings = face_recognition.face_encodings(
-                    photo_arr, known_face_locations=faces_found
-                )
-                save_faces(
-                    image_id=photo_id, encodings=faces_encodings, locations=faces_found,
-                    cursor=cursor
-                )
-                photo.save("output/0_{}_{}.jpg".format(len(faces_found), hash))
-        else:
+        if photo == None:
             print('Skipped photo {}'.format(photo_id))
-        flag_photo_as_processed(photo_id=photo_id, cursor=cursor)
+            flag_photo_as_processed(photo_id=photo_id, cursor=cursor)
+            return
+
+        photo_arr = np.array(photo)
+        faces_found = find_faces(
+            photo_arr,
+            image_name=hash,
+            model="cnn",
+            upsample=1)
+        if(len(faces_found) > 0):
+            faces_encodings = face_recognition.face_encodings(photo_arr, known_face_locations=faces_found)
+            save_faces(
+                image_id=photo_id, cursor=cursor,
+                encodings=faces_encodings, locations=faces_found,
+            )
+            photo.save("output/{}_{}.jpg".format(len(faces_found), hash))
+        flag_photo_as_processed(photo_id=photo_id, cursor=cursor, face_count=len(faces_found))
     return _process
 
 
-if __name__ == "__main__":
-    batch_size = int(sys.argv[1]) if len(sys.argv) > 1 else 5
+def find_closest_match_by_id(*, face_id, cursor):
+    template = Template(open('./queries/get_face_encodings.sql.jinja').read())
+    query = template.render()
+    cursor.execute(query, (face_id,))
+    encodings = cursor.fetchall()[0]
+    return find_closest_match_in_db(face_encodings=encodings, cursor=cursor)
+
+
+def find_closest_match_in_db(*, face_encodings, cursor):
+    template = Template(open('./queries/find_closest_match.sql.jinja').read())
+    query = template.render(encodings=enumerate(face_encodings))
+    cursor.execute(query)
+    return cursor.fetchall()
+
+
+def read_config():
     config = configparser.ConfigParser()
     config.read('./config.ini')
     db_config = dict(config['db_config'].items())
     photoprism_config = dict(config['photoprism'].items())
     host = photoprism_config.pop('host')
 
-    (cnx, cursor) = db_setup.connect(**db_config)
+    return dict(
+        host=host,
+        photoprism_config=photoprism_config,
+        db_config=db_config
+    )
+
+
+def main():
+    batch_size = int(sys.argv[1]) if len(sys.argv) > 1 else 5
+    conf = read_config()
+    (cnx, cursor) = db_setup.connect(**conf.db_config)
     db_setup.create_tables(cursor=cursor)
     pic_from_queue(
         cnx=cnx,
-        process=process(api.Api(host), cursor=cursor),
+        process=process(api.Api(conf.host), cursor=cursor),
         batch_size=batch_size, skip=50)
     cnx.commit()
     cursor.close()
     cnx.close()
+
+
+if __name__ == "__main__":
+    conf = read_config()
+    (cnx, cursor) = db_setup.connect(**conf['db_config'])
+    results = find_closest_match_by_id(face_id=55, cursor=cursor)
+    print(results)
