@@ -12,6 +12,7 @@ import configparser
 import api
 import os
 import webbrowser
+from queries import Queries
 
 
 def pic_from_queue(cnx, process, batch_size=5, skip=0):
@@ -42,18 +43,11 @@ def pic_from_queue(cnx, process, batch_size=5, skip=0):
 # =========== Face recognition section =============================
 
 
-encoding_columns = ["TERM_{} ".format(i) for i in range(128)]
-
-save_query = Template("""
-INSERT INTO faces 
-(photo_id, locations, {{ encoding_columns | join(',') }})
-VALUES (%s, %s, {% for i in range(127) %} %s, {% endfor %} %s)
-""").render(encoding_columns=encoding_columns)
-
-
 def save_faces(image_id, encodings, locations, cursor):
     for (encoding, location) in zip(encodings, locations):
-        cursor.execute(save_query, (image_id, json.dumps(location)) + tuple(encoding))
+        cursor.execute(
+            Queries.save_face,
+            (image_id, json.dumps(location)) + tuple(encoding))
 
 
 def flag_photo_as_processed(photo_id, cursor, face_count=0):
@@ -105,16 +99,14 @@ def process(api, cursor):
 
 
 def find_closest_match_by_id(*, face_id, cursor, limit=50):
-    template = Template(open('./queries/get_face_encodings.sql.jinja').read())
-    query = template.render()
+    query = Queries.get_face_encodings.render()
     cursor.execute(query, (face_id,))
     encodings = cursor.fetchall()[0]
     return find_closest_match_in_db(face_encodings=encodings, cursor=cursor, limit=limit)
 
 
 def find_closest_match_in_db(*, face_encodings, cursor, limit=50):
-    template = Template(open('./queries/find_closest_match.sql.jinja').read())
-    query = template.render(encodings=enumerate(face_encodings))
+    query = Queries.find_closest_match.render(encodings=enumerate(face_encodings))
     cursor.execute(query, {'limit': limit})
     return cursor.fetchall()
 
