@@ -6,12 +6,12 @@ from mysql.connector import errorcode
 def create_faces_table():
     rows = [" TERM_{} DOUBLE".format(n) for n in range(128)]
     query = '''
-        create table if not exists faces (
-            id bigint auto_increment primary key,
-            photo_id int(10) unsigned not null,
-            locations JSON not null,
+        CREATE TABLE if NOT EXISTS faces (
+            id BIGINT AUTO_INCREMENT PRIMARY KEY,
+            file_id INT(10) UNSIGNED NOT NULL,
+            locations JSON NOT NULL,
             {rows},
-            FOREIGN KEY fk (photo_id) REFERENCES photos (id) ON UPDATE RESTRICT
+            FOREIGN KEY fk (file_id) REFERENCES files (id) ON UPDATE RESTRICT
         ) ENGINE = InnoDB;
     '''.format(rows=",\n".join(rows))
     return query
@@ -24,7 +24,7 @@ def create_photo_queue_table():
         checked boolean default false,
         face_count INT UNSIGNED DEFAULT 0 NOT NULL
         ) ENGINE = InnoDB 
-        SELECT photo_id, file_hash from files
+        SELECT id as file_id, file_hash from files
         WHERE file_type IN (0x6A7067)
         '''
     return query

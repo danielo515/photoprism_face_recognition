@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Identify faces</title>
+    <style>
+      {% include 'style.jinja.css' %}
+    </style>
+  </head>
+  <body>
+    <main class="grid-container">
+      {% for (url, (top, right, bottom, left), face_id) in images %}
+      <div class="shape">
+        <div
+          class="crop"
+          style="
+            background-image: url('{{ url }}');
+          "
+        >
+          <div
+            class="face-square"
+            style="
+            top: {{ top }}px; left: {{ left }}px; 
+            right: calc(224px - {{ right }}px); bottom: calc(224px - {{ bottom }}px);"
+          >
+          Unknown
+          </div>
+          <div class="info">face id:{{ face_id }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </main>
+  </body>
+</html>

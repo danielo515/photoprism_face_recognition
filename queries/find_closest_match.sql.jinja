@@ -5,10 +5,10 @@ sqrt(
     {% endfor -%}
 0)
 {% endmacro %}
-SELECT  f.id, f.locations, e.file_hash, {{ euclidea_distance() }} as distance 
-FROM faces f
+SELECT  face.id, face.locations, e.file_hash, {{ euclidea_distance() }} as distance 
+FROM faces face
 LEFT JOIN files e
-ON f.photo_id = e.photo_id
+ON face.file_id = e.id
 HAVING distance < 0.5
 ORDER BY distance ASC
 LIMIT %(limit)s

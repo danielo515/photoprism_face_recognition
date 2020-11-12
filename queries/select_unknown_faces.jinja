@@ -1,0 +1,16 @@
+{% macro euclidea_distance() %}
+sqrt(
+    {% for i in range(128) -%}
+    power( a.TERM_{{ i }} - b.TERM_{{ i }}, 2) + 
+    {% endfor -%}
+0)
+{% endmacro %}
+SELECT  a.id face_a, a.locations a_locations, fa.file_hash a_file,
+        b.id face_b, b.locations b_locations, fb.file_hash b_file,
+        {{ euclidea_distance() }} as distance 
+FROM faces a
+INNER JOIN faces b ON a.id <> b.id
+INNER JOIN files fa ON fa.id = a.file_id
+INNER JOIN files fb ON fb.id = b.file_id
+HAVING distance > 0.6
+LIMIT %(limit)s

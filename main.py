@@ -1,4 +1,5 @@
-from jinja2 import Template
+from re import template
+from jinja2 import Template, FileSystemLoader, Environment
 from PIL import Image, ImageDraw
 import json
 from face_recognition.api import face_encodings, face_locations
@@ -17,22 +18,22 @@ from queries import Queries
 
 def pic_from_queue(cnx, process, batch_size=5, skip=0):
     cursor = cnx.cursor()
-    countQuery = "SELECT count(photo_id) FROM photo_queue WHERE checked = FALSE"
+    countQuery = "SELECT count(file_id) FROM photo_queue WHERE checked = FALSE"
     cursor.execute(countQuery)
     (count,) = cursor.fetchall()[0]
     print("There are {} items on the queue".format(count))
     query = """
-    SELECT photo_id, file_hash FROM photo_queue 
+    SELECT file_id, file_hash FROM photo_queue 
     WHERE checked = False LIMIT %s OFFSET %s
     """
     time_start = datetime.now()
     for batch in range(int(count/batch_size)):
         cursor.execute(query, (batch_size, skip))
-        for (photo_id, hash) in cursor.fetchall():
+        for (file_id, hash) in cursor.fetchall():
             # try:
-            process(hash=hash, photo_id=photo_id)
+            process(hash=hash, file_id=file_id)
             # except:
-            #     print("An error ocurred in batch {} processing {}".format(batch, photo_id))
+            #     print("An error ocurred in batch {} processing {}".format(batch, file_id))
         print(cursor.rowcount)
         cnx.commit()
     print("Processed {} photos in queue in {} time".format(
@@ -50,13 +51,13 @@ def save_faces(image_id, encodings, locations, cursor):
             (image_id, json.dumps(location)) + tuple(encoding))
 
 
-def flag_photo_as_processed(photo_id, cursor, face_count=0):
-    # print("Flagging", photo_id)
+def flag_photo_as_processed(file_id, cursor, face_count=0):
+    # print("Flagging", file_id)
     cursor.execute("""
     UPDATE photo_queue
     SET checked = 1, face_count = %s
-    WHERE photo_id = %s;
-    """, (face_count, photo_id))
+    WHERE file_id = %s;
+    """, (face_count, file_id))
 
 
 def get_encodings(image, faces_locations):
@@ -66,35 +67,32 @@ def get_encodings(image, faces_locations):
             for locations in faces_locations]
 
 
-def find_faces(image_to_check, image_name, model, upsample):
+def find_faces(image_to_check, model, upsample):
     face_locations = face_recognition.face_locations(image_to_check, number_of_times_to_upsample=upsample, model=model)
-    # if len(face_locations) > 0:
-    #     print(image_name, " has {} faces".format(len(face_locations)))
     return face_locations
 
 
 def process(api, cursor):
-    def _process(hash, photo_id):
+    def _process(hash, file_id):
         photo = api.fetch_photo(hash=hash)
         if photo == None:
-            print('Skipped photo {}'.format(photo_id))
-            flag_photo_as_processed(photo_id=photo_id, cursor=cursor)
+            print('Skipped photo {}'.format(file_id))
+            flag_photo_as_processed(file_id=file_id, cursor=cursor)
             return
 
         photo_arr = np.array(photo)
         faces_found = find_faces(
             photo_arr,
-            image_name=hash,
             model="cnn",
             upsample=0)
         if(len(faces_found) > 0):
             faces_encodings = face_recognition.face_encodings(photo_arr, known_face_locations=faces_found)
             save_faces(
-                image_id=photo_id, cursor=cursor,
+                image_id=file_id, cursor=cursor,
                 encodings=faces_encodings, locations=faces_found,
             )
             photo.save("output/{}_{}.jpg".format(len(faces_found), hash))
-        flag_photo_as_processed(photo_id=photo_id, cursor=cursor, face_count=len(faces_found))
+        flag_photo_as_processed(file_id=file_id, cursor=cursor, face_count=len(faces_found))
     return _process
 
 
@@ -156,6 +154,12 @@ def read_config():
     )
 
 
+def cleanup(cnx, cursor):
+    cnx.commit()
+    cursor.close()
+    cnx.close()
+
+
 def main():
     batch_size = int(sys.argv[1]) if len(sys.argv) > 1 else 5
     conf = read_config()
@@ -165,9 +169,35 @@ def main():
         cnx=cnx,
         process=process(api.Api(conf['host']), cursor=cursor),
         batch_size=batch_size, skip=50)
-    cnx.commit()
-    cursor.close()
-    cnx.close()
+    cleanup(cnx=cnx, cursor=cursor)
+
+
+def render_html(*, template_name, output, images):
+    str = open(template_name).read()
+    template = Environment(loader=FileSystemLoader(os.path.realpath('./templates'))).from_string(str)
+    rendered = template.render(images=images)
+    with open(output, 'w') as f:
+        f.write(rendered)
+
+
+def find_unknown_faces(*, cursor, api, limit=200):
+    cursor.execute(Queries.unknown_faces.render(), {'limit': limit})
+    results = []
+    for (a_id, a_locations, a_hash, b_id, b_locations, b_hash, _) in cursor:
+        results.append((api.get_img_url(hash=a_hash), json.loads(a_locations), a_id))
+        results.append((api.get_img_url(hash=b_hash),  json.loads(b_locations), b_id))
+    return results
+
+
+def find_unknown_faces_cmd():
+    conf = read_config()
+    (cnx, cursor) = db_setup.connect(**conf['db_config'])
+    _api = api.Api(conf['host'])
+    images = find_unknown_faces(cursor=cursor, api=_api)
+    render_html(
+        output='unknown.html', template_name='./templates/unknown_faces.html.jinja', images=images)
+    webbrowser.open('file://{}'.format(os.path.realpath('./unknown.html')))
+    cleanup(cnx=cnx, cursor=cursor)
 
 
 def lookup_faces_cmd():
@@ -185,12 +215,14 @@ def lookup_faces_cmd():
         (_api.get_img_url(hash=hash), json.loads(locations), distance, id)
         for (id, locations, hash, distance) in results
     ]
-    with open('results.html', 'w') as f:
-        rendered = Template(open('./templates/faces.jinja.html').read()).render(images=images)
-        f.write(rendered)
+    render_html(
+        output='results.html', template_name='./templates/faces.jinja.html',
+        images=images, )
     webbrowser.open('file://{}'.format(os.path.realpath('./results.html')))
+    cleanup(cnx=cnx, cursor=cursor)
 
 
 if __name__ == "__main__":
+    find_unknown_faces_cmd()
     # main()
-    lookup_faces_cmd()
+    # lookup_faces_cmd()
