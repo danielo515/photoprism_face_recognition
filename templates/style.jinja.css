@@ -10,6 +10,18 @@ html * {
   overflow: hidden;
 }
 
+.crop-face {
+  width: 100px;
+  height: 100px;
+  border-radius: 100%;
+  background-repeat: no-repeat;
+  transition: all 0.2s;
+}
+
+.crop-face:hover {
+  border-radius: 0;
+}
+
 .face-square {
   position: absolute;
   opacity: 0;

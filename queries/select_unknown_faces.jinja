@@ -5,7 +5,7 @@ sqrt(
     {% endfor -%}
 0)
 {% endmacro %}
-SELECT  a.id face_a, a.locations a_locations, fa.file_hash a_file,
+{# SELECT  a.id face_a, a.locations a_locations, fa.file_hash a_file,
         b.id face_b, b.locations b_locations, fb.file_hash b_file,
         {{ euclidea_distance() }} as distance 
 FROM faces a
@@ -13,4 +13,10 @@ INNER JOIN faces b ON a.id <> b.id
 INNER JOIN files fa ON fa.id = a.file_id
 INNER JOIN files fb ON fb.id = b.file_id
 HAVING distance > 0.6
+LIMIT %(limit)s #}
+
+SELECT  faces.id, locations a_locations, file_hash a_file
+FROM faces 
+INNER JOIN files fa ON fa.id = faces.file_id
+ORDER by RAND()
 LIMIT %(limit)s

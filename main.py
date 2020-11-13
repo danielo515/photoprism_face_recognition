@@ -172,10 +172,10 @@ def main():
     cleanup(cnx=cnx, cursor=cursor)
 
 
-def render_html(*, template_name, output, images):
+def render_html(*, template_name, output, **args):
     str = open(template_name).read()
     template = Environment(loader=FileSystemLoader(os.path.realpath('./templates'))).from_string(str)
-    rendered = template.render(images=images)
+    rendered = template.render(args)
     with open(output, 'w') as f:
         f.write(rendered)
 
@@ -183,9 +183,10 @@ def render_html(*, template_name, output, images):
 def find_unknown_faces(*, cursor, api, limit=200):
     cursor.execute(Queries.unknown_faces.render(), {'limit': limit})
     results = []
-    for (a_id, a_locations, a_hash, b_id, b_locations, b_hash, _) in cursor:
+    # for (a_id, a_locations, a_hash, b_id, b_locations, b_hash, _) in cursor:
+    for (a_id, a_locations, a_hash) in cursor:
         results.append((api.get_img_url(hash=a_hash), json.loads(a_locations), a_id))
-        results.append((api.get_img_url(hash=b_hash),  json.loads(b_locations), b_id))
+        # results.append((api.get_img_url(hash=b_hash),  json.loads(b_locations), b_id))
     return results
 
 
@@ -195,7 +196,7 @@ def find_unknown_faces_cmd():
     _api = api.Api(conf['host'])
     images = find_unknown_faces(cursor=cursor, api=_api)
     render_html(
-        output='unknown.html', template_name='./templates/unknown_faces.html.jinja', images=images)
+        output='unknown.html', template_name='./templates/unknown_faces.html.jinja', images=images, crop_size=100)
     webbrowser.open('file://{}'.format(os.path.realpath('./unknown.html')))
     cleanup(cnx=cnx, cursor=cursor)
 
@@ -217,7 +218,7 @@ def lookup_faces_cmd():
     ]
     render_html(
         output='results.html', template_name='./templates/faces.jinja.html',
-        images=images, )
+        images=images)
     webbrowser.open('file://{}'.format(os.path.realpath('./results.html')))
     cleanup(cnx=cnx, cursor=cursor)
 

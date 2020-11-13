@@ -5,52 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Identify faces</title>
     <style>
-      html * {
-        box-sizing: border-box;
-      }
-      .crop {
-        width: 224px;
-        height: 224px;
-        background-position: center;
-        background-size: cover;
-        position: relative;
-        overflow: hidden;
-      }
-
-      .face-square {
-        position: absolute;
-        opacity: 0;
-        background: rgba(0, 0, 0, 0.1);
-        border: 1px dashed blue;
-        padding: 8px 16px;
-        transition: all 0.2s;
-        color: white;
-        font-size: 12px;
-      }
-      .info {
-        position: absolute;
-        bottom: 0px;
-        left: 8px;
-        height: 16px;
-        font-size: 12px;
-        color: white;
-      }
-      .crop:hover > .face-square {
-        opacity: 1;
-      }
-
-      .grid-container {
-        display: flex;
-        padding: 16px;
-        max-width: 1080px;
-        flex-wrap: wrap;
-        justify-content: center;
-        align-items: center;
-        margin: 0 auto;
-      }
-      .grid-container > .shape {
-        padding: 16px;
-      }
+      {% include 'style.jinja.css' %}
     </style>
   </head>
   <body>

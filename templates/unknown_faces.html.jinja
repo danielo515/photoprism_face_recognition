@@ -11,23 +11,21 @@
   <body>
     <main class="grid-container">
       {% for (url, (top, right, bottom, left), face_id) in images %}
+      {% set offset = ( ( crop_size - (right - left ))/2 | abs ) %}
+      {% set left_x = left - offset %}
+      {% set top_y = top - offset %}
       <div class="shape">
         <div
-          class="crop"
+          data-coord="{{(top, right, bottom, left)}}"
+          class="crop-face"
           style="
             background-image: url('{{ url }}');
+            background-position-x: -{{ left_x }}px;
+            background-position-y: -{{ top_y }}px;
           "
         >
-          <div
-            class="face-square"
-            style="
-            top: {{ top }}px; left: {{ left }}px; 
-            right: calc(224px - {{ right }}px); bottom: calc(224px - {{ bottom }}px);"
-          >
-          Unknown
-          </div>
-          <div class="info">face id:{{ face_id }}</div>
         </div>
+        <div class="info">face id:{{ face_id }}</div>
       </div>
       {% endfor %}
     </main>
