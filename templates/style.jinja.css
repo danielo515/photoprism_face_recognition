@@ -1,3 +1,5 @@
+{% set crop_expand =  20 %}
+{% set crop_expanded = crop_size + crop_expand %}
 html * {
   box-sizing: border-box;
 }
@@ -10,16 +12,27 @@ html * {
   overflow: hidden;
 }
 
+.crop-wrapper {
+  position: relative;
+  width: {{ crop_expanded }}px;
+  height: {{ crop_expanded }}px;
+}
 .crop-face {
   width: 100px;
   height: 100px;
   border-radius: 100%;
   background-repeat: no-repeat;
   transition: all 0.2s;
+  position: absolute;
+  top: {{ crop_expand / 2}}px;
+  left: {{ crop_expand / 2}}px;
 }
 
 .crop-face:hover {
-  border-radius: 0;
+  width: {{ crop_expanded }}px;
+  height: {{ crop_expanded }}px;
+  top: 0;
+  left: 0;
 }
 
 .face-square {

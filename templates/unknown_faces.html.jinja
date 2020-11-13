@@ -14,7 +14,7 @@
       {% set offset = ( ( crop_size - (right - left ))/2 | abs ) %}
       {% set left_x = left - offset %}
       {% set top_y = top - offset %}
-      <div class="shape">
+      <div class="crop-wrapper">
         <div
           data-coord="{{(top, right, bottom, left)}}"
           class="crop-face"
