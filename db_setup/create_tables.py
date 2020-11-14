@@ -2,6 +2,15 @@
 import mysql.connector
 from mysql.connector import errorcode
 
+tables = {
+    'people': """
+        CREATE TABLE if NOT EXISTS people (
+            id BIGINT AUTO_INCREMENT PRIMARY KEY,
+            name TEXT NOT NULL
+        ) ENGINE = InnoDB;
+    """
+}
+
 
 def create_faces_table():
     rows = [" TERM_{} DOUBLE".format(n) for n in range(128)]
@@ -61,3 +70,4 @@ def connect(*, user, password, host):
 def create_tables(cursor):
     create_table(name='faces', description=create_faces_table(), cursor=cursor)
     create_table(name='photo_queue', description=create_photo_queue_table(), cursor=cursor)
+    create_table(name='people', description=tables['people'], cursor=cursor)

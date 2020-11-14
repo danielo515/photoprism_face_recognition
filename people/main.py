@@ -1,33 +1,42 @@
 
-class People():
+create = """
+INSERT into people (name)
+VALUES (%s)
+"""
+
+assign = """
+UPDATE faces
+SET person_id = %s,
+WHERE face_id = %s,
+"""
+
+
+class People:
     """
     Manage people and their faces on the database
     """
 
-    def __init__(self, cursor):
+    def __init__(self, cnx, log=print):
         """
         Takes a cursor so it can be used for db operations
         """
-        self.cursor = cursor
+        self.cursor = cnx.cursor(buffered=True)
+        self.cnx = cnx
+        self.log = log
 
     def create(self, *, name):
         """
         Creates a new person on the database
         """
-        query = """
-        INSERT into people (name)
-        VALUES (%s)
-        """
         try:
-            self.cursor.execute(query, (name,))
+            print("Creating a new person named", name)
+            self.cursor.execute(create, (name,))
+            self.cnx.commit()
+            id = self.cursor.lastrowid
+            return id
         except:
             print("Unknown error while creating a new person {}".format(name))
-            return None
+            return -1
 
     def assign_face(self, *, face_id, person_id):
-        query = """
-        UPDATE faces
-        SET person_id = %s,
-        WHERE face_id = %s,
-        """
-        self.cursor.execute(query, (person_id, face_id))
+        self.cursor.execute(assign, (person_id, face_id))

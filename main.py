@@ -186,6 +186,6 @@ def lookup_faces_cmd():
 
 
 if __name__ == "__main__":
-    find_unknown_faces_cmd()
-    # main()
+    # find_unknown_faces_cmd()
+    main()
     # lookup_faces_cmd()
