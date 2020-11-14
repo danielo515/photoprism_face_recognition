@@ -1,4 +1,4 @@
-{% set crop_expand =  20 %}
+{% set crop_expand =  30 %}
 {% set crop_expanded = crop_size + crop_expand %}
 html * {
   box-sizing: border-box;
