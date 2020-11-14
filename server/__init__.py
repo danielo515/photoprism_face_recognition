@@ -28,7 +28,7 @@ def create_person():
     name = request.json.get('name')
     id = person.create(name=name)
     print("Created person with ", (id, name))
-    return id
+    return dict(result={'id': id})
 
 
 @app.route('/person/<int:person_id>/face/<int:face_id>', methods=['POST'])

@@ -5,7 +5,7 @@ from mysql.connector import errorcode
 tables = {
     'people': """
         CREATE TABLE if NOT EXISTS people (
-            id BIGINT AUTO_INCREMENT PRIMARY KEY,
+            id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
             name TEXT NOT NULL
         ) ENGINE = InnoDB;
     """
@@ -18,9 +18,11 @@ def create_faces_table():
         CREATE TABLE if NOT EXISTS faces (
             id BIGINT AUTO_INCREMENT PRIMARY KEY,
             file_id INT(10) UNSIGNED NOT NULL,
+            person_id INT(10) UNSIGNED NULL,
             locations JSON NOT NULL,
             {rows},
-            FOREIGN KEY fk (file_id) REFERENCES files (id) ON UPDATE RESTRICT
+            FOREIGN KEY fk (file_id) REFERENCES files (id) ON UPDATE RESTRICT,
+            FOREIGN KEY person_FK (person_id) REFERENCES people (id)
         ) ENGINE = InnoDB;
     '''.format(rows=",\n".join(rows))
     return query
@@ -68,6 +70,6 @@ def connect(*, user, password, host):
 
 
 def create_tables(cursor):
+    create_table(name='people', description=tables['people'], cursor=cursor)
     create_table(name='faces', description=create_faces_table(), cursor=cursor)
     create_table(name='photo_queue', description=create_photo_queue_table(), cursor=cursor)
-    create_table(name='people', description=tables['people'], cursor=cursor)
