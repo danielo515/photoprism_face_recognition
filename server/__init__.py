@@ -23,6 +23,22 @@ def unknown_faces():
     return render_template('unknown_faces.html.jinja', images=images, crop_size=100)
 
 
+@app.route('/person/<int:id>/faces')
+def known_person_faces(id):
+    faces = person.faces(id=id)
+    possible_faces = person.get_potential_faces(id=id)
+    person_data = person.from_db(id=id)
+    print(faces)
+    return render_template(
+        'faces.html.jinja',
+        name=person_data['name'],
+        faces=faces,
+        possible_faces=possible_faces,
+        api=api,
+        crop_size=100
+    )
+
+
 @app.route('/person', methods=['POST'])
 def create_person():
     name = request.json.get('name')

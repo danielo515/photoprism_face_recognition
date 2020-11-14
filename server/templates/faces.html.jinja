@@ -3,19 +3,21 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Identify faces</title>
+    <title>{{ name }}</title>
     <style>
       {% include 'style.jinja.css' %}
     </style>
   </head>
   <body>
-    <main class="grid-container">
-      {% for (url, (top, right, bottom, left), distance, face_id) in images %}
+    {% macro print_faces(faces) %}
+        
+      {% for face in faces %}
+      {% set (top, right, bottom, left) = face.locations %}
       <div class="shape">
         <div
           class="crop"
           style="
-            background-image: url('{{ url }}');
+            background-image: url('{{ api.get_img_url(face.file_hash) }}');
           "
         >
           <div
@@ -24,12 +26,20 @@
             top: {{ top }}px; left: {{ left }}px; 
             right: calc(224px - {{ right }}px); bottom: calc(224px - {{ bottom }}px);"
           >
-            {{distance}}
+            {{face.distance}}
           </div>
-          <div class="info">face id:{{ face_id }}</div>
+          <div class="info">face id:{{ face.id }}</div>
         </div>
       </div>
       {% endfor %}
-    </main>
+    {% endmacro %}
+    <section >
+        <h1>Known faces</h1>
+        <div class="grid-container">{{ print_faces(faces) }}</div>
+    </section>
+    <section >
+        <h1>Possible matches</h1>
+        <div class="grid-container">{{ print_faces(possible_faces)}}</div>
+    </section>
   </body>
 </html>

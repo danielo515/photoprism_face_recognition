@@ -7,8 +7,11 @@ sqrt(
 {% endmacro %}
 SELECT  face.id, face.locations, e.file_hash, {{ euclidea_distance() }} as distance 
 FROM faces face
-LEFT JOIN files e
+INNER JOIN files e
 ON face.file_id = e.id
-HAVING distance < 0.5
+{% if ignore_known %}
+WHERE face.person_id is NULL
+{% endif %}
+HAVING distance < 0.5 and distance > 0
 ORDER BY distance ASC
 LIMIT %(limit)s

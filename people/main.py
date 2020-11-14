@@ -14,7 +14,7 @@ WHERE id = %(face_id)s
 list_people = "SELECT * from people"
 
 person_faces = """
-SELECT faces.id, files.file_hash, person_id FROM faces 
+SELECT faces.id, files.file_hash, person_id, locations FROM faces 
 LEFT JOIN files on files.id = faces.file_id
 WHERE person_id = %(id)s
 """
@@ -67,10 +67,16 @@ class People:
         self.cursor.execute(list_people)
         return {'people': self.cursor.fetchall()}
 
+    def from_db(self, id):
+        self.cursor.execute(
+            'SELECT * FROM people WHERE id = %(id)s',
+            {'id': id})
+        return self.cursor.fetchall()[0]
+
     def faces(self, id):
         self.cursor.execute(person_faces, {'id': id})
         result = self.cursor.fetchall()
-        return result
+        return list(map(parse_face_locations, result))
 
     def get_potential_faces(self, id):
         self.cursor.execute(person_face, {'id': id})
@@ -78,5 +84,6 @@ class People:
         face_encodings = faces.get_face_encodings(face_id=face_id, cursor=self.raw_cursor)
         possible_faces = faces.find_closest_match_in_db(
             face_encodings=face_encodings,
+            ignore_known=True,
             cursor=self.cursor)
         return list(map(parse_face_locations, possible_faces))

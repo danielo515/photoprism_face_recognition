@@ -16,8 +16,11 @@ def find_closest_match_by_id(*, face_id, cursor, limit=50):
         limit=limit)
 
 
-def find_closest_match_in_db(*, face_encodings, cursor, limit=50):
-    query = Queries.find_closest_match.render(encodings=enumerate(face_encodings))
+def find_closest_match_in_db(*, face_encodings, cursor, ignore_known=False, limit=50):
+    query = Queries.find_closest_match.render(
+        ignore_known=ignore_known,
+        encodings=enumerate(face_encodings)
+    )
     cursor.execute(query, {'limit': limit})
     return cursor.fetchall()
 
