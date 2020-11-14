@@ -25,12 +25,12 @@ const post = (url, params) =>
 
 const assign_face_to_person = async ({ person_id, face_id }) => {
     const result = (
-        await fetch(`person/${person_id}/face/${face_id}`, { method: "POST" })
+        await fetch(`people/${person_id}/face/${face_id}`, { method: "POST" })
     ).json();
     console.log(result);
 };
 
 const createPerson = async ({ name }) => {
-    const result = await post(`/person`, { name });
+    const result = await post(`/people`, { name });
     console.log(result);
 };
