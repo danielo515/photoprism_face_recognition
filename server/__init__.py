@@ -33,7 +33,22 @@ def create_person():
 
 @app.route('/person/<int:person_id>/face/<int:face_id>', methods=['POST'])
 def assign_face_to_person(person_id, face_id):
-    return json.dumps([person_id, face_id])
+    result = person.assign_face(face_id=face_id, person_id=person_id)
+    return dict(result=result)
+
+
+@app.route('/people')
+def list_people():
+    return {'result': person.list()}
+
+
+@app.route('/people/<int:id>/faces')
+def list_person_faces(id):
+    return {'result': {
+        'id': id,
+        'faces': person.faces(id=id),
+        'possibles': person.get_potential_faces(id=id)
+    }}
 
 
 with app.test_request_context():

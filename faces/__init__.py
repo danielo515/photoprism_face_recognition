@@ -2,11 +2,18 @@ import json
 from queries import Queries
 
 
-def find_closest_match_by_id(*, face_id, cursor, limit=50):
+def get_face_encodings(*, face_id, cursor):
     query = Queries.get_face_encodings.render()
     cursor.execute(query, (face_id,))
     encodings = cursor.fetchall()[0]
-    return find_closest_match_in_db(face_encodings=encodings, cursor=cursor, limit=limit)
+    return encodings
+
+
+def find_closest_match_by_id(*, face_id, cursor, limit=50):
+    return find_closest_match_in_db(
+        face_encodings=get_face_encodings(face_id=face_id, cursor=cursor),
+        cursor=cursor,
+        limit=limit)
 
 
 def find_closest_match_in_db(*, face_encodings, cursor, limit=50):
