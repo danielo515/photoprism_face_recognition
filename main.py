@@ -9,11 +9,13 @@ from datetime import datetime
 import numpy as np
 import face_recognition
 import db_setup
-import configparser
 import api
 import os
 import webbrowser
 from queries import Queries
+
+from config import config
+import faces
 
 
 def pic_from_queue(cnx, process, batch_size=5, skip=0):
@@ -96,19 +98,6 @@ def process(api, cursor):
     return _process
 
 
-def find_closest_match_by_id(*, face_id, cursor, limit=50):
-    query = Queries.get_face_encodings.render()
-    cursor.execute(query, (face_id,))
-    encodings = cursor.fetchall()[0]
-    return find_closest_match_in_db(face_encodings=encodings, cursor=cursor, limit=limit)
-
-
-def find_closest_match_in_db(*, face_encodings, cursor, limit=50):
-    query = Queries.find_closest_match.render(encodings=enumerate(face_encodings))
-    cursor.execute(query, {'limit': limit})
-    return cursor.fetchall()
-
-
 def show_prediction_labels_on_image(img, predictions):
     """
     Shows the face recognition results visually.
@@ -140,20 +129,6 @@ def show_prediction_labels_on_image(img, predictions):
     pil_image.show()
 
 
-def read_config():
-    config = configparser.ConfigParser()
-    config.read('./config.ini')
-    db_config = dict(config['db_config'].items())
-    photoprism_config = dict(config['photoprism'].items())
-    host = photoprism_config.pop('host')
-
-    return dict(
-        host=host,
-        photoprism_config=photoprism_config,
-        db_config=db_config
-    )
-
-
 def cleanup(cnx, cursor):
     cnx.commit()
     cursor.close()
@@ -162,7 +137,7 @@ def cleanup(cnx, cursor):
 
 def main():
     batch_size = int(sys.argv[1]) if len(sys.argv) > 1 else 5
-    conf = read_config()
+    conf = config
     (cnx, cursor) = db_setup.connect(**conf['db_config'])
     db_setup.create_tables(cursor=cursor)
     pic_from_queue(
@@ -174,29 +149,17 @@ def main():
 
 def render_html(*, template_name, output, **args):
     str = open(template_name).read()
-    template = Environment(loader=FileSystemLoader(os.path.realpath('./templates'))).from_string(str)
+    template = Environment(loader=FileSystemLoader(os.path.realpath('./server/templates'))).from_string(str)
     rendered = template.render(args)
     with open(output, 'w') as f:
         f.write(rendered)
 
 
-def find_unknown_faces(*, cursor, api, limit=200):
-    cursor.execute(Queries.unknown_faces.render(), {'limit': limit})
-    results = []
-    # for (a_id, a_locations, a_hash, b_id, b_locations, b_hash, _) in cursor:
-    for (a_id, a_locations, a_hash) in cursor:
-        results.append((api.get_img_url(hash=a_hash), json.loads(a_locations), a_id))
-        # results.append((api.get_img_url(hash=b_hash),  json.loads(b_locations), b_id))
-    return results
-
-
 def find_unknown_faces_cmd():
-    conf = read_config()
-    (cnx, cursor) = db_setup.connect(**conf['db_config'])
-    _api = api.Api(conf['host'])
-    images = find_unknown_faces(cursor=cursor, api=_api)
+    (cnx, cursor) = db_setup.connect(**config['db_config'])
+    images = faces.find_unknown_in_db(cursor=cursor, api=api.Api(config['host']))
     render_html(
-        output='unknown.html', template_name='./templates/unknown_faces.html.jinja', images=images, crop_size=100)
+        output='output/unknown.html', template_name='./templates/unknown_faces.html.jinja', images=images, crop_size=100)
     webbrowser.open('file://{}'.format(os.path.realpath('./unknown.html')))
     cleanup(cnx=cnx, cursor=cursor)
 
@@ -207,17 +170,16 @@ def lookup_faces_cmd():
         exit(1)
     face_id = int(sys.argv[1])
     limit = int(sys.argv[2]) if len(sys.argv) > 2 else 50
-    conf = read_config()
-    (cnx, cursor) = db_setup.connect(**conf['db_config'])
-    results = find_closest_match_by_id(face_id=face_id, cursor=cursor, limit=limit)
-    _api = api.Api(conf['host'])
+    (cnx, cursor) = db_setup.connect(**config['db_config'])
+    results = faces.find_closest_match_by_id(face_id=face_id, cursor=cursor, limit=limit)
+    _api = api.Api(config['host'])
     print("Found {} faces".format(len(results)))
     images = [
         (_api.get_img_url(hash=hash), json.loads(locations), distance, id)
         for (id, locations, hash, distance) in results
     ]
     render_html(
-        output='results.html', template_name='./templates/faces.jinja.html',
+        output='output/results.html', template_name='./templates/faces.jinja.html',
         images=images)
     webbrowser.open('file://{}'.format(os.path.realpath('./results.html')))
     cleanup(cnx=cnx, cursor=cursor)
