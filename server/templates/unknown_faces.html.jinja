@@ -16,7 +16,7 @@
     <script src="static/App.js"></script>
   </head>
   <body>
-    <main class="grid-container">
+    <main class="grid-container main">
       {% for (url, (top, right, bottom, left), face_id) in images %}
       {# Faces are square, so we can calculate just one side #}
       {% set face_size =  right - left %}
@@ -42,5 +42,6 @@
       </div>
       {% endfor %}
     </main>
+    <div class="toolbar" id="toolbar"></div>
   </body>
 </html>

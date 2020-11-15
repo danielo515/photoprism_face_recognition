@@ -57,6 +57,7 @@ const appState = {
         id: null,
     },
     selectedFaces: new Set(),
+    selectedPerson: null,
 };
 
 const selectFace = (evt) => {
@@ -65,4 +66,39 @@ const selectFace = (evt) => {
     id = node.id;
     node.classList.add("selected");
     appState.selectedFaces.add(id);
+    toolbar();
+};
+
+const clearSelection = () => {
+    document
+        .querySelectorAll(".selected")
+        .forEach((node) => node.classList.remove("selected"));
+    appState.selectedFaces.clear();
+};
+
+const toolbar = () => {
+    const toolbarDom = document.getElementById("toolbar");
+    const options = hyperHTML.wire(
+        appState,
+        ":people-options"
+    )`${server_data.people.map(
+        (item) => hyperHTML.wire(item, ":option")`
+        <option value=${item.id}>
+            ${item.name}
+        </option>
+        `
+    )}
+    `;
+    hyperHTML(toolbarDom)`
+    <button onClick=${() =>
+        assignSelectedFacesToPerson({
+            person_id: appState.selectedPerson,
+        })}>Assign selection to: </button>
+    <select onchange=${(e) => (appState.selectedPerson = e.target.value)}>
+        <option hidden selected> Select a person</option>
+        ${options}
+    </select>
+    <button onClick=${clearSelection}>clear selection</button>
+    `;
+    toolbarDom.classList.add("toolbar-show");
 };
