@@ -20,7 +20,12 @@ person = People(cnx=cnx)
 @app.route('/unknown')
 def unknown_faces():
     images = faces.find_unknown_in_db(cursor=cursor, api=api)
-    return render_template('unknown_faces.html.jinja', images=images, crop_size=100)
+    existing_people = person.list()
+    return render_template(
+        'unknown_faces.html.jinja',
+        images=images,
+        people=existing_people,
+        crop_size=100)
 
 
 @app.route('/person/<int:id>/faces')

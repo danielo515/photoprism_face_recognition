@@ -10,6 +10,9 @@
     <style>
       {% include 'style.jinja.css' %}
     </style>
+    <script>
+        const server_data = JSON.parse('{{ people | tojson }}')
+    </script>
     <script src="static/App.js"></script>
   </head>
   <body>
