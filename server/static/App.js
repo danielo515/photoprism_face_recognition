@@ -24,13 +24,45 @@ const post = (url, params) =>
     }).then((x) => x.json());
 
 const assign_face_to_person = async ({ person_id, face_id }) => {
-    const result = (
-        await fetch(`people/${person_id}/face/${face_id}`, { method: "POST" })
-    ).json();
+    const result = await post(`people/${person_id}/faces`, {
+        faces: [face_id],
+    });
+    console.log(result);
+};
+
+const removeFacesFromDOM = (ids) => {
+    ids.forEach((id) => document.getElementById(id).parentElement.remove());
+};
+
+const assignSelectedFacesToPerson = async ({ person_id }) => {
+    const faces = [...appState.selectedFaces];
+    console.log({ faces });
+    const result = await post(`people/${person_id}/faces`, { faces });
+    removeFacesFromDOM(faces);
+    appState.selectedFaces.clear();
     console.log(result);
 };
 
 const createPerson = async ({ name }) => {
-    const result = await post(`/people`, { name });
+    const result = await post(`/people`, {
+        name,
+        faces: [...appState.selectedFaces],
+    });
+    appState.selectedFaces.clear();
     console.log(result);
+};
+
+const appState = {
+    lastClicked: {
+        id: null,
+    },
+    selectedFaces: new Set(),
+};
+
+const selectFace = (evt) => {
+    const node = evt.currentTarget;
+    const data = node.dataset;
+    id = node.id;
+    node.classList.add("selected");
+    appState.selectedFaces.add(id);
 };

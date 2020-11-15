@@ -42,14 +42,19 @@ def known_person_faces(id):
 @app.route('/people', methods=['POST'])
 def create_person():
     name = request.json.get('name')
-    id = person.create(name=name)
+    faces = request.json.get('faces')
+    id, faces = person.create(name=name, faces=faces)
     print("Created person with ", (id, name))
-    return dict(result={'id': id})
+    return dict(result={'id': id, 'faces_count': faces})
 
 
-@app.route('/people/<int:person_id>/face/<int:face_id>', methods=['POST'])
-def assign_face_to_person(person_id, face_id):
-    result = person.assign_face(face_id=face_id, person_id=person_id)
+@app.route('/people/<int:person_id>/faces', methods=['POST'])
+def assign_face_to_person(person_id):
+    faces = request.json.get('faces')
+    if len(faces) > 1:
+        result = person.assign_many_faces(faces=faces, person_id=person_id)
+    else:
+        result = person.assign_face(face_id=faces[0], person_id=person_id)
     return dict(result=result)
 
 

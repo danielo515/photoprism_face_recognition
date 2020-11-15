@@ -57,6 +57,25 @@ html * {
   opacity: 1;
 }
 
+.gree-tick::before {
+    /* This is not exactly nice */
+    display: inline-block;
+    transform: rotate(45deg);
+    height: 25px;
+    width: 12px;
+    margin-left: 60%; 
+    border-bottom: 7px solid #78b13f;
+    border-right: 7px solid #78b13f;
+    content: "";
+}
+.selected::before {
+    color: green;
+    font-family: "FontAwesome";
+    font-weight: 900; 
+    /*content: "\f144a";*/
+    content: "\f058";
+}
+
 .grid-container {
   display: flex;
   padding: 16px;

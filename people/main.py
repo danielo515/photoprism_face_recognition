@@ -10,6 +10,11 @@ UPDATE faces
 SET person_id = %(person_id)s
 WHERE id = %(face_id)s
 """
+assign_many = """
+UPDATE faces
+SET person_id = %s
+WHERE id IN (%s)
+"""
 
 list_people = "SELECT * from people"
 
@@ -46,22 +51,31 @@ class People:
         self.cnx.commit()
         return self.cursor
 
-    def create(self, *, name):
+    def create(self, *, name, faces=()):
         """
         Creates a new person on the database
         """
-        try:
-            print("Creating a new person named", name)
-            self.cursor.execute(create, (name,))
-            self.cnx.commit()
-            id = self.cursor.lastrowid
-            return id
-        except:
-            print("Unknown error while creating a new person {}".format(name))
-            return -1
+        # try:
+        print("Creating a new person named", name)
+        self.cursor.execute(create, (name,))
+        self.cnx.commit()
+        id = self.cursor.lastrowid
+        if len(faces) > 0:
+            print('Extra faces for new person', faces)
+            self.assign_many_faces(faces=faces, person_id=id)
+        return id, faces
+        # except:
+        #     print("Unknown error while creating a new person {}".format(name))
+        #     return -1
 
     def assign_face(self, *, face_id, person_id):
         return {'updated': self.execute(assign, person_id=person_id, face_id=face_id).rowcount}
+
+    def assign_many_faces(self, *, faces, person_id):
+        self.cursor.executemany(assign_many, [(person_id, face) for face in faces])
+        self.cnx.commit()
+        updated = self.cursor.rowcount
+        return {'updated': updated}
 
     def list(self):
         self.cursor.execute(list_people)
