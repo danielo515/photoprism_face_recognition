@@ -1,2 +1,2 @@
 
-from .main import People
+from .people import People
