@@ -3,7 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{ name }}</title>
+    <title>Known people</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <style>
       {% include 'style.jinja.css' %}
     </style>
@@ -13,7 +14,7 @@
         
       {% for person in people %}
       {% set (top, right, bottom, left) = person[ 'locations' ] %}
-      <div class="shape">
+      <div class="shape"><a href="{{ url_for('known_person_faces', id=person.person_id) }}" >
         <div
           class="crop"
           style="
@@ -29,7 +30,7 @@
           </div>
           <div class="info">{{ person.name }}</div>
         </div>
-      </div>
+     </a> </div>
       {% endfor %}
     {% endmacro %}
     <section class="main">
