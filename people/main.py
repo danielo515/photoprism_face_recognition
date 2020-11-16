@@ -81,6 +81,10 @@ class People:
         self.cursor.execute(list_people)
         return {'people': self.cursor.fetchall()}
 
+    def list_with_faces(self):
+        self.cursor.execute(list_people)
+        return {'people': self.cursor.fetchall()}
+
     def from_db(self, id):
         self.cursor.execute(
             'SELECT * FROM people WHERE id = %(id)s',

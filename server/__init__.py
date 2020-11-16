@@ -16,9 +16,32 @@ api = Api(config['host'])
 person = People(cnx=cnx)
 
 
+# PAGES
 @app.route('/')
 @app.route('/unknown')
 def unknown_faces():
+    images = faces.find_unknown_in_db(cursor=cursor, api=api)
+    existing_people = person.list()
+    return render_template(
+        'unknown_faces.html.jinja',
+        images=images,
+        people=existing_people,
+        crop_size=100)
+
+
+@app.route('/known_people')
+def known_faces():
+    images = faces.find_unknown_in_db(cursor=cursor, api=api)
+    existing_people = person.list()
+    return render_template(
+        'unknown_faces.html.jinja',
+        images=images,
+        people=existing_people,
+        crop_size=100)
+
+
+@app.route('/config')
+def config_page():
     images = faces.find_unknown_in_db(cursor=cursor, api=api)
     existing_people = person.list()
     return render_template(
@@ -33,7 +56,6 @@ def known_person_faces(id):
     faces = person.faces(id=id)
     possible_faces = person.get_potential_faces(id=id)
     person_data = person.from_db(id=id)
-    print(faces)
     return render_template(
         'faces.html.jinja',
         name=person_data['name'],
@@ -43,6 +65,8 @@ def known_person_faces(id):
         crop_size=100
     )
 
+
+# API
 
 @app.route('/people', methods=['POST'])
 def create_person():
