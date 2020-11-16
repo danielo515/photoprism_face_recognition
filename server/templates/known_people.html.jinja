@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ name }}</title>
+    <style>
+      {% include 'style.jinja.css' %}
+    </style>
+  </head>
+  <body><div class="page">
+    {% macro print_faces(people) %}
+        
+      {% for person in people %}
+      {% set (top, right, bottom, left) = person[ 'locations' ] %}
+      <div class="shape">
+        <div
+          class="crop"
+          style="
+            background-image: url('{{ api.get_img_url(person.file_hash) }}');
+          "
+        >
+          <div
+            class="face-square"
+            style="
+            top: {{ top }}px; left: {{ left }}px; 
+            right: calc(224px - {{ right }}px); bottom: calc(224px - {{ bottom }}px);"
+          >
+          </div>
+          <div class="info">{{ person.name }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    {% endmacro %}
+    <section class="main">
+        <h1>Known people</h1>
+        <div class="grid-container">{{ print_faces(people) }}</div>
+    </section>
+    {% include 'sidebar.html.jinja' %}
+ </div> </body>
+</html>

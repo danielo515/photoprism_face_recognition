@@ -31,12 +31,12 @@ def unknown_faces():
 
 @app.route('/known_people')
 def known_faces():
-    images = faces.find_unknown_in_db(cursor=cursor, api=api)
-    existing_people = person.list()
+    known_people = person.list_with_faces()
+    print(known_people)
     return render_template(
-        'unknown_faces.html.jinja',
-        images=images,
-        people=existing_people,
+        'known_people.html.jinja',
+        people=known_people['people'],
+        api=api,
         crop_size=100)
 
 

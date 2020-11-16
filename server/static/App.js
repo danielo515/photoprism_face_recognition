@@ -16,6 +16,11 @@ const markFaces = () => {
     return facesDom;
 };
 
+const toggleClass = (id, className) => {
+    const classes = document.getElementById(id).classList;
+    classes.toggle(className);
+};
+
 const post = (url, params) =>
     fetch(url, {
         method: "POST",
@@ -64,8 +69,14 @@ const selectFace = (evt) => {
     const node = evt.currentTarget;
     const data = node.dataset;
     id = node.id;
-    node.classList.add("selected");
-    appState.selectedFaces.add(id);
+    classList = node.classList;
+    if (appState.selectedFaces.has(id)) {
+        classList.remove("selected");
+        appState.selectedFaces.delete(id);
+    } else {
+        node.classList.add("selected");
+        appState.selectedFaces.add(id);
+    }
     toolbar();
 };
 

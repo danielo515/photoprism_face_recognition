@@ -18,6 +18,13 @@ WHERE id IN (%s)
 
 list_people = "SELECT * from people"
 
+list_with_faces = """
+SELECT people.id person_id, faces.id face_id, files.file_hash, people.name, faces.locations  FROM people
+INNER JOIN faces on faces.person_id = people.id
+LEFT JOIN files on files.id = faces.file_id
+GROUP  by people.id
+"""
+
 person_faces = """
 SELECT faces.id, files.file_hash, person_id, locations FROM faces 
 LEFT JOIN files on files.id = faces.file_id
@@ -82,8 +89,9 @@ class People:
         return {'people': self.cursor.fetchall()}
 
     def list_with_faces(self):
-        self.cursor.execute(list_people)
-        return {'people': self.cursor.fetchall()}
+        self.cursor.execute(list_with_faces)
+        results = self.cursor.fetchall()
+        return {'people': list(map(parse_face_locations, results))}
 
     def from_db(self, id):
         self.cursor.execute(
