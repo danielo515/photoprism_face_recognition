@@ -1,12 +1,14 @@
+import { toolbar } from './toolbar';
+
 const getCoords = (x) => {
     const [top, right, bottom, left] = x.dataset.coord
-        .replace(/[ ()]/g, "")
-        .split(",")
+        .replace(/[ ()]/g, '')
+        .split(',')
         .map(Number);
     return { top, right, bottom, left };
 };
 const markFaces = () => {
-    const facesDom = document.querySelector(".crop-face");
+    const facesDom = document.querySelector('.crop-face');
     const pos = getCoords(facesDom);
     console.log(pos);
     hyperHTML.bind(facesDom)`<div class='face-square' style=${{
@@ -23,9 +25,9 @@ const toggleClass = (id, className) => {
 
 const post = (url, params) =>
     fetch(url, {
-        method: "POST",
+        method: 'POST',
         body: JSON.stringify(params),
-        headers: { "Content-Type": "application/json" },
+        headers: { 'Content-Type': 'application/json' },
     }).then((x) => x.json());
 
 const assign_face_to_person = async ({ person_id, face_id }) => {
@@ -39,7 +41,7 @@ const removeFacesFromDOM = (ids) => {
     ids.forEach((id) => document.getElementById(id).parentElement.remove());
 };
 
-const assignSelectedFacesToPerson = async ({ person_id }) => {
+export const assignSelectedFacesToPerson = async ({ person_id }) => {
     const faces = [...appState.selectedFaces];
     console.log({ faces });
     const result = await post(`people/${person_id}/faces`, { faces });
@@ -57,7 +59,7 @@ const createPerson = async ({ name }) => {
     console.log(result);
 };
 
-const appState = {
+export const appState = {
     lastClicked: {
         id: null,
     },
@@ -68,48 +70,23 @@ const appState = {
 const selectFace = (evt) => {
     const node = evt.currentTarget;
     const data = node.dataset;
-    id = node.id;
-    classList = node.classList;
+    const id = node.id;
+    const classList = node.classList;
     if (appState.selectedFaces.has(id)) {
-        classList.remove("selected");
+        classList.remove('selected');
         appState.selectedFaces.delete(id);
     } else {
-        node.classList.add("selected");
+        node.classList.add('selected');
         appState.selectedFaces.add(id);
     }
     toolbar();
 };
 
-const clearSelection = () => {
-    document
-        .querySelectorAll(".selected")
-        .forEach((node) => node.classList.remove("selected"));
-    appState.selectedFaces.clear();
-};
+window.selectFace = selectFace;
 
-const toolbar = () => {
-    const toolbarDom = document.getElementById("toolbar");
-    const options = hyperHTML.wire(
-        appState,
-        ":people-options"
-    )`${server_data.people.map(
-        (item) => hyperHTML.wire(item, ":option")`
-        <option value=${item.id}>
-            ${item.name}
-        </option>
-        `
-    )}
-    `;
-    hyperHTML(toolbarDom)`
-    <button onClick=${() =>
-        assignSelectedFacesToPerson({
-            person_id: appState.selectedPerson,
-        })}>Assign selection to: </button>
-    <select onchange=${(e) => (appState.selectedPerson = e.target.value)}>
-        <option hidden selected> Select a person</option>
-        ${options}
-    </select>
-    <button onClick=${clearSelection}>clear selection</button>
-    `;
-    toolbarDom.classList.add("toolbar-show");
+export const clearSelection = () => {
+    document
+        .querySelectorAll('.selected')
+        .forEach((node) => node.classList.remove('selected'));
+    appState.selectedFaces.clear();
 };

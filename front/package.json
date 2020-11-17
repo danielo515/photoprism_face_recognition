@@ -5,7 +5,8 @@
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "css": "postcss src/styles/**/[^_]*.scss --dir ../server/static --ext css"
+        "css": "postcss src/styles/**/[^_]*.scss --dir ../server/static --ext css",
+        "start": "snowpack build --watch"
     },
     "keywords": [],
     "author": "",
@@ -15,7 +16,8 @@
         "autoprefixer": "9.8.6",
         "postcss-cli": "^8.2.0",
         "postcss-scss": "^3.0.4",
-        "snowpack": "^2.17.1"
+        "snowpack": "^2.17.1",
+        "tailwindcss": "^1.9.6"
     },
     "dependencies": {
         "hyperhtml": "^2.33.0"
