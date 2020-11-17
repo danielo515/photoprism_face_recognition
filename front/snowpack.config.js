@@ -6,6 +6,7 @@ module.exports = {
     mount: {
         src: '/',
     },
+    exclude: ['./src/styles/*'],
     plugins: [['@snowpack/plugin-run-script', { cmd: 'yarn css --watch' }]],
     // installOptions: {},
     install: ['hyperhtml'],
@@ -14,6 +15,7 @@ module.exports = {
     },
     buildOptions: {
         out: '../server/static',
+        clean: true,
     },
     proxy: {
         '/app': 'http://localhost:5000',

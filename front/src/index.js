@@ -8,5 +8,3 @@ const toggleClass = (id, className) => {
     const classes = document.getElementById(id).classList;
     classes.toggle(className);
 };
-
-console.log('Danielo, eres puto, puto reputo');
