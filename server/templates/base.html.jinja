@@ -18,14 +18,16 @@
             crossorigin="anonymous"
         />
         <title>{% block title %} {% endblock title %}</title>
+        {% block head %} {% endblock head %}
         <style>
             {% include 'style.jinja.css' %}
         </style>
     </head>
     <body>
-        <section class="">
-            {% include 'sidebar.html.jinja' %}
+        <section class="page">
             <div class="main">{% block content %}{% endblock content %}</div>
+            {% include 'sidebar.html.jinja' %}
         </section>
+        {% block footer %} {% endblock footer %}
     </body>
 </html>

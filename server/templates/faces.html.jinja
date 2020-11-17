@@ -1,4 +1,7 @@
 {% extends 'base.html.jinja' %} 
+{% block title %}
+    {{ name }}
+{% endblock title %}
 {% macro print_faces(faces) %}
 {% for face in faces %}
 {% set (top, right, bottom, left) = face.locations %}
