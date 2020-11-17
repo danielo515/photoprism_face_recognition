@@ -1,16 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Known people</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <style>
-      {% include 'style.jinja.css' %}
-    </style>
-  </head>
-  <body><div class="page">
-    {% macro print_faces(people) %}
+{% extends 'base.html.jinja' %}
+{% macro print_faces(people) %}
         
       {% for person in people %}
       {% set (top, right, bottom, left) = person[ 'locations' ] %}
@@ -32,11 +21,8 @@
         </div>
      </a> </div>
       {% endfor %}
-    {% endmacro %}
-    <section class="main">
+{% endmacro %}
+{% block content %}
         <h1>Known people</h1>
         <div class="grid-container">{{ print_faces(people) }}</div>
-    </section>
-    {% include 'sidebar.html.jinja' %}
- </div> </body>
-</html>
+{% endblock content %}

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link
+            href="https://fonts.googleapis.com/css?family=Nunito+Sans:200,300,400,600,700"
+            rel="stylesheet"
+        />
+        <link
+            href="https://fonts.googleapis.com/css?family=Montserrat:400,700"
+            rel="stylesheet"
+        />
+        <link
+            rel="stylesheet"
+            href="https://use.fontawesome.com/releases/v5.2.0/css/all.css"
+            integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ"
+            crossorigin="anonymous"
+        />
+        <title>{% block title %} {% endblock title %}</title>
+        <style>
+            {% include 'style.jinja.css' %}
+        </style>
+    </head>
+    <body>
+        <section class="">
+            {% include 'sidebar.html.jinja' %}
+            <div class="main">{% block content %}{% endblock content %}</div>
+        </section>
+    </body>
+</html>
