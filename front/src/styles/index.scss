@@ -1,8 +1,5 @@
-@tailwind base;
-
-@tailwind components;
-
-@tailwind utilities;
+@import './common.scss';
+@import './modal.scss';
 
 %bg {
     @apply bg-gray-800;

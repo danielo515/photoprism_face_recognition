@@ -1,0 +1,19 @@
+.modal-wrapper {
+    @apply fixed inset-0;
+}
+
+.modal-wrapper-inner {
+    position: absolute;
+    @apply items-center justify-center flex inset-0;
+}
+
+.modal-body {
+    @apply rounded bg-gray-100 flex justify-center items-center;
+    min-width: 200px;
+    min-height: 200px;
+    max-height: 80%;
+}
+
+.modal-closed {
+    display: none;
+}
