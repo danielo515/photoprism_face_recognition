@@ -6,7 +6,8 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "css": "postcss src/styles/**/[^_]*.scss --dir ../server/static --ext css",
-        "start": "snowpack build --watch"
+        "build": "parcel build src/index.js -d ../server/static",
+        "start": "parcel src/index.js -d ../server/static"
     },
     "keywords": [],
     "author": "",
@@ -14,6 +15,7 @@
     "devDependencies": {
         "@csstools/postcss-sass": "^4.0.0",
         "autoprefixer": "9.8.6",
+        "parcel": "^1.12.4",
         "postcss-cli": "^8.2.0",
         "postcss-scss": "^3.0.4",
         "snowpack": "^2.17.1",
@@ -22,5 +24,8 @@
     },
     "dependencies": {
         "hyperhtml": "^2.33.0"
-    }
+    },
+    "browserslist": [
+        "last 1 Chrome versions"
+    ]
 }

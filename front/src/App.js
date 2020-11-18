@@ -67,7 +67,7 @@ export const appState = {
     selectedPerson: null,
 };
 
-const selectFace = (evt) => {
+export const selectFace = (evt) => {
     const node = evt.currentTarget;
     const data = node.dataset;
     const id = node.id;
@@ -81,8 +81,6 @@ const selectFace = (evt) => {
     }
     toolbar();
 };
-
-window.selectFace = selectFace;
 
 export const clearSelection = () => {
     document
