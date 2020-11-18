@@ -1,5 +1,6 @@
 import newUserBtn from './person-btn';
-import { appState, assignSelectedFacesToPerson, clearSelection } from './App';
+import { appState, clearSelection } from './App';
+import { assignSelectedFacesToPerson } from './api';
 
 export const toolbar = () => {
     const toolbarDom = document.getElementById('toolbar');
