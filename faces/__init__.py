@@ -1,4 +1,6 @@
 import json
+import face_recognition
+import numpy as np
 from queries import Queries
 
 
@@ -33,3 +35,26 @@ def find_unknown_in_db(*, cursor, api, limit=200):
         results.append((api.get_img_url(hash=a_hash), json.loads(a_locations), a_id))
         # results.append((api.get_img_url(hash=b_hash),  json.loads(b_locations), b_id))
     return results
+
+
+def find_in_photo(photo):
+    photo_arr = np.array(photo)
+    locations = face_recognition.face_locations(
+        photo_arr,
+        model="cnn",
+        number_of_times_to_upsample=0
+    )
+    if(len(locations) > 0):
+        encodings = face_recognition.face_encodings(
+            photo_arr,
+            known_face_locations=locations)
+        return (encodings, locations)
+    else:
+        return ([], [])
+
+
+def save_to_db(image_id, encodings, locations, cursor):
+    for (encoding, location) in zip(encodings, locations):
+        cursor.execute(
+            Queries.save_face,
+            (image_id, json.dumps(location)) + tuple(encoding))
