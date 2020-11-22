@@ -1,6 +1,9 @@
+from process_photos.process_photos import process
+from process_photos import process_photos
+from photo_queue import PhotoQueue
 from flask import Flask, render_template, request
 import json
-
+from threading import Thread
 from flask.helpers import url_for
 from config import config
 from api import Api
@@ -66,7 +69,35 @@ def known_person_faces(id):
     )
 
 
+threads = dict(photos=None)
+
 # API
+
+
+@app.route('/cmd/scan', methods=['POST'])
+def start_scan():
+    if threads['photos'] == None or not threads['photos'].is_alive():
+        queue = PhotoQueue(cnx)
+        queue.fill_queue()
+        threads['photos'] = Thread(
+            target=queue.consume,
+            kwargs=dict(process=process_photos.process(api=api, cursor=cnx.cursor()))
+        )
+        threads['photos'].start()
+        return {'result': 'Scan has started'}
+
+    return {'result': 'in_progress'}
+
+
+@app.route('/scan')
+def scan_status():
+    "Returns the scan status"
+    if threads['photos'] == None:
+        return {'result': 'not_started'}
+    if threads['photos'].is_alive():
+        return {'result': 'in_progress'}
+    return {'result': 'finished'}
+
 
 @app.route('/people', methods=['POST'])
 def create_person():
@@ -77,6 +108,11 @@ def create_person():
     return dict(result={'id': id, 'faces_count': faces})
 
 
+@app.route('/people')
+def list_people():
+    return {'result': person.list()}
+
+
 @app.route('/people/<int:person_id>/faces', methods=['POST'])
 def assign_face_to_person(person_id):
     faces = request.json.get('faces')
@@ -85,11 +121,6 @@ def assign_face_to_person(person_id):
     else:
         result = person.assign_face(face_id=faces[0], person_id=person_id)
     return dict(result=result)
-
-
-@app.route('/people')
-def list_people():
-    return {'result': person.list()}
 
 
 @app.route('/people/<int:id>/faces')

@@ -17,7 +17,7 @@ class PhotoQueue(object):
         self.cnx = cnx
 
     def fill_queue(self):
-        cursor = self.cnx()
+        cursor = self.cnx.cursor()
         cursor.execute(self.fill_queue_query)
         self.cnx.commit()
 
@@ -32,7 +32,7 @@ class PhotoQueue(object):
         WHERE checked = False LIMIT %s OFFSET %s
         """
         time_start = datetime.now()
-        for batch in range(int(count/batch_size)):
+        for batch in range(max(1, int(count/batch_size))):
             cursor.execute(query, (batch_size, skip))
             for (file_id, hash) in cursor.fetchall():
                 # try:
