@@ -1,3 +1,4 @@
+{% set crop_size = crop_size or 100 %}
 {% set crop_expand =  30 %}
 {% set crop_expanded = crop_size + crop_expand %}
 

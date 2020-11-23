@@ -43,17 +43,6 @@ def known_faces():
         crop_size=100)
 
 
-@app.route('/config')
-def config_page():
-    images = faces.find_unknown_in_db(cursor=cursor, api=api)
-    existing_people = person.list()
-    return render_template(
-        'unknown_faces.html.jinja',
-        images=images,
-        people=existing_people,
-        crop_size=100)
-
-
 @app.route('/person/<int:id>/faces')
 def known_person_faces(id):
     faces = person.faces(id=id)
@@ -74,6 +63,15 @@ threads = dict(photos=None)
 # API
 
 
+def get_scan_status():
+    thread = threads['photos']
+    if thread == None:
+        return 'not_started'
+    if thread.is_alive():
+        return 'in_progress'
+    return 'finished'
+
+
 @app.route('/cmd/scan', methods=['POST'])
 def start_scan():
     if threads['photos'] == None or not threads['photos'].is_alive():
@@ -92,11 +90,12 @@ def start_scan():
 @app.route('/scan')
 def scan_status():
     "Returns the scan status"
-    if threads['photos'] == None:
-        return {'result': 'not_started'}
-    if threads['photos'].is_alive():
-        return {'result': 'in_progress'}
-    return {'result': 'finished'}
+    return {'result': get_scan_status()}
+
+
+@app.route('/config')
+def config_page():
+    return render_template('config.html.jinja', scan_status=get_scan_status())
 
 
 @app.route('/people', methods=['POST'])

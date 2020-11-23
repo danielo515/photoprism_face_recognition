@@ -99,7 +99,12 @@ body {
 }
 
 .button {
-    @apply px-3 py-2 rounded-md text-sm font-medium text-white bg-gray-900;
+    @apply px-3 py-2 rounded-md text-sm font-medium text-white bg-purple-900;
+
+    &:hover {
+        @apply bg-purple-500 text-gray-700;
+    }
+
     &:focus {
         @apply outline-none text-white bg-gray-700;
     }
