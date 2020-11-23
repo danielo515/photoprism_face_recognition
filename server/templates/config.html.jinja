@@ -2,10 +2,14 @@
 {% block title %}
     Config
 {% endblock title %}
+{% block head %}
+    <script>
+        window.page = "config"
+        window.server_data = { scan_status: "{{scan_status}}" }
+    </script>
+{% endblock head %}
 {% block content %}
         <h1>Scan photo library</h1>
         <div>Scan status: {{ scan_status }}</div>
-        {% if scan_status == 'not_started' %}
-            <button type='submit' class="button primary">Start scanning</button>
-        {% endif %}
+        <div id="config"></div>
 {% endblock content %}
