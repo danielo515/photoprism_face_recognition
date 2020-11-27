@@ -1,21 +1,20 @@
-import newUserBtn from './person-btn';
+import ButtonIcon from './ButtonIcon';
 import { appState, clearSelection } from './App';
 import { assignSelectedFacesToPerson } from './api';
+import { wire, bind } from 'hyperhtml';
+import NewPerson from './NewPerson';
 
 export const toolbar = () => {
     const toolbarDom = document.getElementById('toolbar');
-    const options = hyperHTML.wire(
-        appState,
-        ':people-options',
-    )`${server_data.people.map(
-        (item) => hyperHTML.wire(item, ':option')`
+    const options = wire(appState, ':people-options')`${server_data.people.map(
+        (item) => wire(item, ':option')`
         <option value=${item.id}>
             ${item.name}
         </option>
         `,
     )}
     `;
-    hyperHTML(toolbarDom)`
+    bind(toolbarDom)`
     <button class="button" onClick=${() =>
         assignSelectedFacesToPerson({
             person_id: appState.selectedPerson,
@@ -24,7 +23,14 @@ export const toolbar = () => {
         <option hidden selected> Select a person</option>
         ${options}
     </select>
-    ${newUserBtn({ onClick: console.log })}
+    ${ButtonIcon({
+        label: 'Create new person',
+        icon: 'user-plus',
+        onClick: NewPerson({
+            faceId: appState.selectedFaces.values().next().value,
+            isOpen: true,
+        }),
+    })}
     <button onClick=${clearSelection}>clear selection</button>
     `;
     if (appState.selectedFaces.size > 0)

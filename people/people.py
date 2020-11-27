@@ -45,9 +45,6 @@ class People:
     """
 
     def __init__(self, cnx, log=print):
-        """
-        Takes a cursor so it can be used for db operations
-        """
         self.cursor = cnx.cursor(buffered=True, dictionary=True)
         self.raw_cursor = cnx.cursor(buffered=True)
         self.cnx = cnx

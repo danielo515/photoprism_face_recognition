@@ -1,5 +1,6 @@
 .modal-wrapper {
     @apply fixed inset-0;
+    background-color: rgba(0, 0, 0, 0.55);
 }
 
 .modal-wrapper-inner {
@@ -8,7 +9,7 @@
 }
 
 .modal-body {
-    @apply rounded bg-gray-100 flex justify-center items-center;
+    @apply rounded bg-gray-100 flex justify-center items-center p-2;
     min-width: 200px;
     min-height: 200px;
     max-height: 80%;

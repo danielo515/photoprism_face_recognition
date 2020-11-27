@@ -4,7 +4,6 @@ import './styles/index.scss';
 import configPage from './configPage';
 
 window.selectFace = selectFace;
-console.log(window.selectFace);
 
 modal({ isOpen: false, content: 'I am just a modal' });
 
