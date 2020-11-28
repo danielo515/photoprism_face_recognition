@@ -4,13 +4,13 @@ import Input from './Input';
 import Modal from './modal';
 import './styles/new-person.scss';
 
-export default function NewPerson({ imgUrl, faceId, isOpen }) {
+export default function NewPerson({ face, isOpen }) {
     const state = { value: '' };
     const save = (e) => e.preventDefault() && console.log(state);
     const onBlur = (value) => (state.value = value);
     const body = wire()`
     <div class="new-person" >
-        <img src="${imgUrl}" alt="new-person-picture"/>
+        <img src="${face.url}" alt="new-person-picture"/>
         <form onsubmit=${save}>
             <div class="form-row">
                 ${Input({

@@ -6,6 +6,7 @@
     <script src="https://unpkg.com/hyperhtml@latest/min.js"></script>
     <script>
         const server_data = JSON.parse('{{ people | tojson }}')
+        window.server_data = server_data
     </script>
 {% endblock head %}
 {% block content %}

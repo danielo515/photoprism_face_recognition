@@ -1,4 +1,4 @@
-import { appState } from './appState';
+import * as state from './appState';
 import { toolbar } from './toolbar';
 
 export const removeFacesFromDOM = (ids) => {
@@ -9,13 +9,12 @@ export const selectFace = (evt) => {
     const node = evt.currentTarget;
     const data = node.dataset;
     const id = node.id;
+    const url = node.style.backgroundImage.replace(/url..([^"]*).*/, '$1');
     const classList = node.classList;
-    if (appState.selectedFaces.has(id)) {
+    if (state.toggleFace({ id, url }) === 'removed') {
         classList.remove('selected');
-        appState.selectedFaces.delete(id);
     } else {
         node.classList.add('selected');
-        appState.selectedFaces.add(id);
     }
     toolbar();
 };
@@ -24,5 +23,5 @@ export const clearSelection = () => {
     document
         .querySelectorAll('.selected')
         .forEach((node) => node.classList.remove('selected'));
-    appState.selectedFaces.clear();
+    state.clearFaces();
 };
