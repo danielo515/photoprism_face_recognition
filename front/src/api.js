@@ -1,4 +1,5 @@
-import { appState, removeFacesFromDOM } from './App';
+import { removeFacesFromDOM } from './App';
+import { appState } from './appState';
 
 const post = (url, params) =>
     fetch(url, {

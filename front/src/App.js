@@ -1,15 +1,8 @@
+import { appState } from './appState';
 import { toolbar } from './toolbar';
 
 export const removeFacesFromDOM = (ids) => {
     ids.forEach((id) => document.getElementById(id).parentElement.remove());
-};
-
-export const appState = {
-    lastClicked: {
-        id: null,
-    },
-    selectedFaces: new Set(),
-    selectedPerson: null,
 };
 
 export const selectFace = (evt) => {

@@ -1,5 +1,6 @@
 import ButtonIcon from './ButtonIcon';
-import { appState, clearSelection } from './App';
+import { clearSelection } from './App';
+import { appState } from './appState';
 import { assignSelectedFacesToPerson } from './api';
 import { wire, bind } from 'hyperhtml';
 import NewPerson from './NewPerson';
