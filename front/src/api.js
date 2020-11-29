@@ -1,6 +1,3 @@
-import { removeFacesFromDOM } from './App';
-import { appState } from './appState';
-
 const post = (url, params) =>
     fetch(url, {
         method: 'POST',
@@ -14,19 +11,21 @@ const assign_face_to_person = async ({ person_id, face_id }) => {
     console.log(result);
 };
 
-export const assignSelectedFacesToPerson = async ({ person_id }) => {
-    const faces = [...appState.selectedFaces];
-    console.log({ faces });
+export const assignFacesToPerson = async ({ person_id, faces }) => {
     const result = await post(`people/${person_id}/faces`, { faces });
-    removeFacesFromDOM(faces);
-    appState.selectedFaces.clear();
-    console.log(result);
+    return { result, faces };
 };
-const createPerson = async ({ name }) => {
+
+/**
+ * Creates a new person with an optional set of faces assigned to him/her
+ * @param {Object} params
+ * @param {string} params.name The name of the new person
+ * @param {string[]} params.faces array of face IDs
+ */
+export const createPerson = async ({ name, faces }) => {
     const result = await post(`/people`, {
         name,
-        faces: [...appState.selectedFaces],
+        faces,
     });
-    appState.selectedFaces.clear();
-    console.log(result);
+    return { result, faces };
 };
