@@ -1,5 +1,11 @@
+@import './common.scss';
 .modal-wrapper {
     @apply fixed inset-0 flex items-center justify-center;
+}
+
+.modal-title {
+    @extend %title-modal;
+    padding-bottom: $p-md;
 }
 
 .modal-background {

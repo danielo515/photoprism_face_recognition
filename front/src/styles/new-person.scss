@@ -1,10 +1,6 @@
 @import './common.scss';
 
 .new-person {
-    .title {
-        @extend %title-modal;
-        padding-bottom: $p-md;
-    }
     .top-section {
         display: flex;
         justify-content: flex-start;

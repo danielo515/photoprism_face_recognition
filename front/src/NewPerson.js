@@ -31,7 +31,6 @@ export default function NewPerson({ faces, isOpen }) {
     const onBlur = (value) => (state.value = value);
     const body = wire(faces)`
     <div class="new-person" >
-    <h2 class="title">Create new person</h2>
     <div class="top-section">
         <img src="${faces[0].url}" alt="new-person-picture"/>
         <form onsubmit=${save}>
@@ -62,6 +61,7 @@ export default function NewPerson({ faces, isOpen }) {
     return Modal({
         content: body,
         isOpen,
+        title: 'Create new person',
         onClose: closeModal,
     });
 }
