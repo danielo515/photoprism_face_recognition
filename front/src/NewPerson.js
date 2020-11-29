@@ -7,6 +7,9 @@ import './styles/new-person.scss';
 import { removeFacesFromDOM } from './App';
 import { clearFaces } from './appState';
 
+const closeModal = () =>
+    Modal({ content: null, isOpen: false, onClose: () => {} });
+
 /**
  *
  * @param {Object} props
@@ -20,6 +23,7 @@ export default function NewPerson({ face, isOpen }) {
         createPerson({ name: state.value, faces: [face.id] }).then(() => {
             removeFacesFromDOM([face.id]);
             clearFaces();
+            closeModal();
         });
     };
     const onBlur = (value) => (state.value = value);
@@ -45,6 +49,6 @@ export default function NewPerson({ face, isOpen }) {
     return Modal({
         content: body,
         isOpen,
-        onClose: () => NewPerson({ face, isOpen: false }),
+        onClose: closeModal,
     });
 }

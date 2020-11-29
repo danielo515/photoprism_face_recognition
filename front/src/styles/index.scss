@@ -1,9 +1,5 @@
 @import './common.scss';
 
-%bg {
-    @apply bg-gray-800;
-}
-
 .info {
     position: absolute;
     bottom: 0px;
@@ -41,23 +37,6 @@
 .main {
     padding-top: 48px;
     padding-left: 200px;
-}
-
-.toolbar {
-    @extend %bg;
-    position: fixed;
-    padding: 24px;
-    top: -50px;
-    left: 0;
-    right: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: all 1s;
-}
-
-.toolbar-show {
-    top: 0;
 }
 
 .page {
@@ -100,6 +79,10 @@ body {
 
 .button {
     @apply px-3 py-2 rounded-md text-sm font-medium text-white bg-purple-900;
+
+    li {
+        @apply pr-1;
+    }
 
     &:hover {
         @apply bg-purple-500 text-gray-700;

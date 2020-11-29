@@ -24,4 +24,5 @@ export const clearSelection = () => {
         .querySelectorAll('.selected')
         .forEach((node) => node.classList.remove('selected'));
     state.clearFaces();
+    toolbar();
 };

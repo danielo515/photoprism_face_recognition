@@ -1,0 +1,21 @@
+@import './common.scss';
+
+.toolbar {
+    @extend %bg;
+    position: fixed;
+    padding: 24px;
+    top: -200px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    transition: all 0.5s;
+    .button {
+        @apply mr-2 ml-2;
+    }
+}
+
+.toolbar-show {
+    top: 0;
+}

@@ -1,12 +1,12 @@
+import './styles/toolbar.scss';
 import ButtonIcon from './ButtonIcon';
 import { clearSelection } from './App';
 import * as State from './appState';
-import { assignSelectedFacesToPerson } from './api';
 import { wire, bind } from 'hyperhtml';
 import NewPerson from './NewPerson';
+import Button from './Button';
 
-export const toolbar = () => {
-    const toolbarDom = document.getElementById('toolbar');
+const select = () => {
     const options = wire(
         State.appState,
         ':people-options',
@@ -18,24 +18,27 @@ export const toolbar = () => {
         `,
     )}
     `;
-    bind(toolbarDom)`
-    <button class="button" onClick=${() =>
-        assignSelectedFacesToPerson({
-            person_id: State.appState.selectedPerson,
-        })}>Assign selection to: </button>
-    <select onchange=${(e) => (State.appState.selectedPerson = e.target.value)}>
+    return `<select onchange=${(e) =>
+        (State.appState.selectedPerson = e.target.value)}>
         <option hidden selected> Select a person</option>
         ${options}
     </select>
+`;
+};
+
+export const toolbar = () => {
+    const toolbarDom = document.getElementById('toolbar');
+    bind(toolbarDom)`
     ${ButtonIcon({
         label: 'Create new person',
         icon: 'user-plus',
-        onClick: NewPerson({
-            face: State.getFirstFace(),
-            isOpen: true,
-        }),
+        onClick: () =>
+            NewPerson({
+                face: State.getFirstFace(),
+                isOpen: true,
+            }),
     })}
-    <button onClick=${clearSelection}>clear selection</button>
+    ${Button({ onClick: clearSelection, label: 'Clear selection' })}
     `;
     if (State.facesCount() > 0) toolbarDom.classList.add('toolbar-show');
     else toolbarDom.classList.remove('toolbar-show');
