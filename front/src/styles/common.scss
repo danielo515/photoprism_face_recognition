@@ -5,3 +5,14 @@
 %bg {
     @apply bg-gray-800;
 }
+
+%title-modal {
+    @apply text-3xl text-indigo-900;
+}
+
+%title-section {
+    @apply text-xl text-indigo-900;
+}
+
+$rounded: 5px;
+$p-md: 16px;

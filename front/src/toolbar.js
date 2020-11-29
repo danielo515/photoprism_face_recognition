@@ -28,18 +28,18 @@ const select = () => {
 
 export const toolbar = () => {
     const toolbarDom = document.getElementById('toolbar');
+    if (State.facesCount() > 0) toolbarDom.classList.add('toolbar-show');
+    else toolbarDom.classList.remove('toolbar-show');
     bind(toolbarDom)`
     ${ButtonIcon({
         label: 'Create new person',
         icon: 'user-plus',
         onClick: () =>
             NewPerson({
-                face: State.getFirstFace(),
+                faces: State.listFaces(),
                 isOpen: true,
             }),
     })}
     ${Button({ onClick: clearSelection, label: 'Clear selection' })}
     `;
-    if (State.facesCount() > 0) toolbarDom.classList.add('toolbar-show');
-    else toolbarDom.classList.remove('toolbar-show');
 };

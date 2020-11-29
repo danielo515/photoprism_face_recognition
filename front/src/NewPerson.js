@@ -6,6 +6,7 @@ import { createPerson } from './api';
 import './styles/new-person.scss';
 import { removeFacesFromDOM } from './App';
 import { clearFaces } from './appState';
+import { FacesList } from './FacesList';
 
 const closeModal = () =>
     Modal({ content: null, isOpen: false, onClose: () => {} });
@@ -13,23 +14,26 @@ const closeModal = () =>
 /**
  *
  * @param {Object} props
- * @param {{id: string, url: string}} props.face The face to assign to the new person
+ * @param {import('./appState').Face[]} props.faces The face to assign to the new person
  * @param {boolean} props.isOpen if the modal should be open
  */
-export default function NewPerson({ face, isOpen }) {
+export default function NewPerson({ faces, isOpen }) {
     const state = { value: '' };
     const save = (e) => {
+        const faceIds = faces.map((x) => x.id);
         e.preventDefault();
-        createPerson({ name: state.value, faces: [face.id] }).then(() => {
-            removeFacesFromDOM([face.id]);
+        createPerson({ name: state.value, faces: faceIds }).then(() => {
+            removeFacesFromDOM(faceIds);
             clearFaces();
             closeModal();
         });
     };
     const onBlur = (value) => (state.value = value);
-    const body = wire(face)`
+    const body = wire(faces)`
     <div class="new-person" >
-        <img src="${face.url}" alt="new-person-picture"/>
+    <h2 class="title">Create new person</h2>
+    <div class="top-section">
+        <img src="${faces[0].url}" alt="new-person-picture"/>
         <form onsubmit=${save}>
             <div class="form-row">
                 ${Input({
@@ -39,11 +43,20 @@ export default function NewPerson({ face, isOpen }) {
                     onChange: onBlur,
                 })}
             </div>
-           <div class="form-row"> ${Button({
-               label: 'Save',
-               onClick: save,
-           })}</div>
+            <div class="form-row">
+                ${Button({
+                    label: 'Save',
+                    onClick: save,
+                })}
+            </div>
         </form>
+    </div>
+        
+    <div class="bottom-section">
+        <h3>Faces that will be assigned</h3>
+            ${FacesList({ faces, className: 'faces-list' })}
+    </div>
+        
     </div>
     `;
     return Modal({

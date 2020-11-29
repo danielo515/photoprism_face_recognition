@@ -1,16 +1,41 @@
+@import './common.scss';
+
 .new-person {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    flex-direction: row;
-    form {
+    .title {
+        @extend %title-modal;
+        padding-bottom: $p-md;
+    }
+    .top-section {
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-start;
+        flex-direction: row;
+        img {
+            border-radius: $rounded;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            justify-items: flex-start;
+            align-items: flex-start;
+            padding-left: 1rem;
+        }
+        .form-row {
+            @apply pt-2;
+        }
+    }
+    .bottom-section {
+        padding-top: $p-md;
         display: flex;
         flex-direction: column;
-        justify-items: flex-start;
-        align-items: flex-start;
-        padding-left: 1rem;
+        h3 {
+            @extend %title-section;
+        }
     }
-    .form-row {
-        @apply pt-2;
+    .faces-list {
+        display: flex;
+        align-items: flex-start;
+        justify-content: flex-start;
+        padding-left: 0;
     }
 }

@@ -1,9 +1,15 @@
+/**
+ * @typedef Face
+ * @property {string} id
+ * @property {string} url
+ */
 export const appState = {
     lastClicked: {
         id: null,
     },
     selectedFaces: {
         list: new Set(),
+        /** @type {Object.<string,Face>} */
         index: {},
     },
     selectedPerson: null,
