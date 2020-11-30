@@ -26,11 +26,12 @@ const select = () => {
 `;
 };
 
+const toolbarDom = document.getElementById('toolbar');
+const render = bind(toolbarDom);
 export const toolbar = () => {
-    const toolbarDom = document.getElementById('toolbar');
     if (State.facesCount() > 0) toolbarDom.classList.add('toolbar-show');
     else toolbarDom.classList.remove('toolbar-show');
-    bind(toolbarDom)`
+    render`
     ${ButtonIcon({
         label: 'Create new person',
         icon: 'user-plus',
