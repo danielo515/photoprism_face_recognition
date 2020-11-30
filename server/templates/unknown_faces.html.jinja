@@ -18,23 +18,22 @@
 {% set left_x = [ left - offset - 2, 0] | max %}
 {% set top_y = [ top - offset - 2, 0 ] | max %}
 <div class="crop-wrapper">
-<div
-    data-coord="{{(top, right, bottom, left)}}"
-    data-faceSize="{{ face_size }}"
-    data-idx="{{ loop.index - 1}}"
-    class="crop-face"
-    onClick="selectFace(event)"
-    id="{{ face_id }}"
-    style="
-    background-image: url('{{ url }}');
-    background-position-x: {{ [ left_x, 100 ] | min}}%;
-    background-position-y: {{ [ top_y, 100 ]| min }}%;
-    "
->
-</div>
-<div class="info">face id:{{ face_id }}</div>
+    <div
+        data-coord="{{(top, right, bottom, left)}}"
+        data-faceSize="{{ face_size }}"
+        data-idx="{{ loop.index - 1}}"
+        class="crop-face"
+        onClick="selectFace(event)"
+        id="{{ face_id }}"
+        style="
+        background-image: url('{{ url }}');
+        background-position-x: {{ [ left_x, 100 ] | min}}%;
+        background-position-y: {{ [ top_y, 100 ]| min }}%;
+        "
+    ></div>
+    <div class="info">face id:{{ face_id }}</div>
 </div>
 {% endfor %}
-<div class="toolbar" id="toolbar"></div>
 </div>
+<div class="toolbar" id="toolbar"></div>
 {% endblock content %}

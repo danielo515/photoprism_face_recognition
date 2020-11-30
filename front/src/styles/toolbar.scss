@@ -1,14 +1,15 @@
 @import './common.scss';
 
 .toolbar {
-    @extend %bg;
+    // @extend %bg;
+    background-color: rgba($color: white, $alpha: 0.8);
     position: fixed;
     padding: 24px;
-    top: -200px;
+    bottom: -200px;
     left: 0;
     right: 0;
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
     align-items: center;
     transition: all 0.5s;
     .button {
@@ -17,5 +18,5 @@
 }
 
 .toolbar-show {
-    top: 0;
+    bottom: 0;
 }
