@@ -4,8 +4,7 @@ import Input from './Input';
 import Modal from './modal';
 import { createPerson } from './api';
 import './styles/new-person.scss';
-import { removeFacesFromDOM } from './App';
-import { clearFaces } from './appState';
+import { removeSelection } from './actions';
 import { FacesList } from './FacesList';
 
 const closeModal = () =>
@@ -22,11 +21,12 @@ export default function NewPerson({ faces, isOpen }) {
     const save = (e) => {
         const faceIds = faces.map((x) => x.id);
         e.preventDefault();
-        createPerson({ name: state.value, faces: faceIds }).then(() => {
-            removeFacesFromDOM(faceIds);
-            clearFaces();
-            closeModal();
-        });
+        createPerson({ name: state.value, faces: faceIds })
+            .then(() => {
+                removeSelection(faceIds);
+                closeModal();
+            })
+            .catch(() => alert('Woops, failed'));
     };
     const onBlur = (value) => (state.value = value);
     const body = wire(faces)`

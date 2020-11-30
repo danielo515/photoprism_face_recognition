@@ -1,7 +1,7 @@
 import * as state from './appState';
 import { toolbar } from './toolbar';
 
-export const removeFacesFromDOM = (ids) => {
+const removeFacesFromDOM = (ids) => {
     ids.forEach((id) => document.getElementById(id).parentElement.remove());
 };
 
@@ -23,6 +23,18 @@ export const clearSelection = () => {
     document
         .querySelectorAll('.selected')
         .forEach((node) => node.classList.remove('selected'));
+    state.clearFaces();
+    toolbar();
+};
+
+/**
+ * Removes the faces from the dom
+ * and clears the selected faces state and
+ * re-renders related nodes
+ * @param {string[]} ids
+ */
+export const removeSelection = (ids) => {
+    removeFacesFromDOM(ids);
     state.clearFaces();
     toolbar();
 };

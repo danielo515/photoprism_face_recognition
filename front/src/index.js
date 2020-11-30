@@ -1,4 +1,4 @@
-import { selectFace } from './App';
+import { selectFace } from './actions';
 import modal from './modal';
 import './styles/index.scss';
 import configPage from './configPage';

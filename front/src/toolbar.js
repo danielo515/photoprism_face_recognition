@@ -1,6 +1,6 @@
 import './styles/toolbar.scss';
 import ButtonIcon from './ButtonIcon';
-import { clearSelection } from './App';
+import { clearSelection } from './actions';
 import * as State from './appState';
 import { wire, bind } from 'hyperhtml';
 import NewPerson from './NewPerson';
