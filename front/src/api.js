@@ -4,6 +4,13 @@ const post = (url, params) =>
         body: JSON.stringify(params),
         headers: { 'Content-Type': 'application/json' },
     }).then((x) => x.json());
+
+const Get = (url) =>
+    fetch(url, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+    }).then((x) => x.json());
+
 const assign_face_to_person = async ({ person_id, face_id }) => {
     const result = await post(`people/${person_id}/faces`, {
         faces: [face_id],
@@ -28,4 +35,15 @@ export const createPerson = async ({ name, faces }) => {
         faces,
     });
     return { result, faces };
+};
+
+/**
+ * Returns a list of possible face matches from a given known face
+ * @param {Object} param
+ * @param {string} param.id the face id
+ * @returns {Promise<{faces: {}, id: string}>} a promise with the possible face matches
+ */
+export const getFaceMatches = async ({ id }) => {
+    const { result } = await Get(`/faces/${id}/matches`);
+    return result;
 };

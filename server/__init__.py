@@ -15,8 +15,14 @@ app = Flask(__name__)
 
 
 (cnx, cursor) = db_setup.connect(**config['db_config'])
+dict_cursor = cnx.cursor(dictionary=True)
 api = Api(config['host'])
 person = People(cnx=cnx)
+
+
+def parse_face_locations(face):
+    face['locations'] = json.loads(face['locations'])
+    return face
 
 
 # PAGES
@@ -60,8 +66,6 @@ def known_person_faces(id):
 
 threads = dict(photos=None)
 
-# API
-
 
 def get_scan_status():
     thread = threads['photos']
@@ -70,6 +74,13 @@ def get_scan_status():
     if thread.is_alive():
         return 'in_progress'
     return 'finished'
+
+
+@app.route('/config')
+def config_page():
+    return render_template('config.html.jinja', scan_status=get_scan_status())
+
+# API
 
 
 @app.route('/cmd/scan', methods=['POST'])
@@ -91,11 +102,6 @@ def start_scan():
 def scan_status():
     "Returns the scan status"
     return {'result': get_scan_status()}
-
-
-@app.route('/config')
-def config_page():
-    return render_template('config.html.jinja', scan_status=get_scan_status())
 
 
 @app.route('/people', methods=['POST'])
@@ -128,6 +134,20 @@ def list_person_faces(id):
         'id': id,
         'faces': person.faces(id=id),
         'possibles': person.get_potential_faces(id=id)
+    }}
+
+
+@app.route('/faces/<int:id>/matches')
+def possible_face_matches(id):
+    face_encodings = faces.get_face_encodings(face_id=id, cursor=cursor)
+    possible_faces = faces.find_closest_match_in_db(
+        face_encodings=face_encodings,
+        ignore_known=True,
+        cursor=dict_cursor)
+
+    return {'result': {
+        'id': id,
+        'faces': list(map(parse_face_locations, possible_faces))
     }}
 
 
