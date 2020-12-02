@@ -41,7 +41,7 @@ export const createPerson = async ({ name, faces }) => {
  * Returns a list of possible face matches from a given known face
  * @param {Object} param
  * @param {string} param.id the face id
- * @returns {Promise<{faces: {}, id: string}>} a promise with the possible face matches
+ * @returns {Promise<{faces: import("./appState").Face[], id: string}>} a promise with the possible face matches
  */
 export const getFaceMatches = async ({ id }) => {
     const { result } = await Get(`/faces/${id}/matches`);

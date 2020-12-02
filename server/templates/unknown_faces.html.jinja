@@ -19,7 +19,7 @@
 {% set top_y = [ top - offset - 2, 0 ] | max %}
 <div class="crop-wrapper">
     <div
-        data-coord="{{(top, right, bottom, left)}}"
+        data-coord='{{ {"top": top, "left": left, "right": right, "bottom": bottom} | tojson }}'
         data-faceSize="{{ face_size }}"
         data-idx="{{ loop.index - 1}}"
         class="crop-face"

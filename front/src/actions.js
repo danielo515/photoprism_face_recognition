@@ -1,4 +1,5 @@
 import * as state from './appState';
+import { getCoords } from './dom-utils';
 import { toolbar } from './toolbar';
 
 const removeFacesFromDOM = (ids) => {
@@ -10,8 +11,9 @@ export const selectFace = (evt) => {
     const data = node.dataset;
     const id = node.id;
     const url = node.style.backgroundImage.replace(/url..([^"]*).*/, '$1');
+    const locations = getCoords(node);
     const classList = node.classList;
-    if (state.toggleFace({ id, url }) === 'removed') {
+    if (state.toggleFace({ id, url, locations }) === 'removed') {
         classList.remove('selected');
     } else {
         node.classList.add('selected');

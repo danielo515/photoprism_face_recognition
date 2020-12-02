@@ -6,7 +6,7 @@ import './FacesList.scss';
  *
  * @param {Object} param
  * @param {import('./appState').Face[]} param.faces
- * @param {string} param.className
+ * @param {string} [param.className]
  */
 export function FacesList({ faces, className = '' }) {
     return wire()`

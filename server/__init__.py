@@ -20,8 +20,10 @@ api = Api(config['host'])
 person = People(cnx=cnx)
 
 
-def parse_face_locations(face):
-    face['locations'] = json.loads(face['locations'])
+def format_faces_response(face):
+    (top, right, bottom, left) = json.loads(face['locations'])
+    face['locations'] = dict(top=top, right=right, bottom=bottom, left=left)
+    face['url'] = api.get_img_url(hash=face['file_hash'])
     return face
 
 
@@ -147,7 +149,7 @@ def possible_face_matches(id):
 
     return {'result': {
         'id': id,
-        'faces': list(map(parse_face_locations, possible_faces))
+        'faces': list(map(format_faces_response, possible_faces))
     }}
 
 

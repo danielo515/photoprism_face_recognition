@@ -2,7 +2,7 @@ import { wire } from 'hyperhtml';
 import Button from './Button';
 import Input from './Input';
 import Modal from './modal';
-import { createPerson } from './api';
+import { createPerson, getFaceMatches } from './api';
 import './styles/new-person.scss';
 import { removeSelection } from './actions';
 import { FacesList } from './FacesList';
@@ -55,6 +55,10 @@ export default function NewPerson({ faces, isOpen }) {
         <h3>Faces that will be assigned</h3>
             ${FacesList({ faces, className: 'faces-list' })}
     </div>
+
+        ${getFaceMatches({ id: faces[0].id }).then(({ faces }) =>
+            FacesList({ faces, className: 'new-person-suggestions' }),
+        )}
         
     </div>
     `;

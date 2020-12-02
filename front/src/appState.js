@@ -2,6 +2,7 @@
  * @typedef Face
  * @property {string} id
  * @property {string} url
+ * @property {{top: number, left: number, bottom: number, right: number}} locations
  */
 export const appState = {
     lastClicked: {
@@ -24,8 +25,14 @@ const getFaces = () => {
     return { list, index };
 };
 
-const add = (id, url) => {
-    appState.selectedFaces.index[id] = { id, url };
+/**
+ *
+ * @param {string} id
+ * @param {string} url
+ * @param {object} locations
+ */
+const add = (id, url, locations) => {
+    appState.selectedFaces.index[id] = { id, url, locations };
     appState.selectedFaces.list.add(id);
     return 'added';
 };
@@ -36,12 +43,21 @@ const remove = (id) => {
     return 'removed';
 };
 
-export function toggleFace({ id, url }) {
+/**
+ * if it is present, remove from selected faces,
+ * if it is not preset, add it
+ * @param {Face} face
+ */
+export function toggleFace({ id, url, locations }) {
     const present = isPresent(id);
     if (present) return remove(id);
-    return add(id, url);
+    return add(id, url, locations);
 }
 
+/**
+ * Adds a face to the list of selected ones
+ * @param {Face} face
+ */
 export function addFace({ id, url }) {
     const present = isPresent(id);
     if (present) return;
@@ -54,9 +70,16 @@ export function removeFace({ id }) {
     remove(id);
 }
 
+/**
+ * @returns {Face[]}
+ */
 export function listFaces() {
     const { list, index } = getFaces();
-    return [...list].map((id) => ({ id, url: index[id].url }));
+    return [...list].map((id) => ({
+        id,
+        url: index[id].url,
+        locations: index[id].locations,
+    }));
 }
 
 export function clearFaces() {
@@ -64,6 +87,10 @@ export function clearFaces() {
     appState.selectedFaces.index = {};
 }
 
+/**
+ * Returns the first face on the list of selected faces
+ * @returns {Face}
+ */
 export const getFirstFace = () => {
     const { list, index } = getFaces();
     return index[list.entries().next().value[0]];

@@ -8,7 +8,6 @@ def get_face_encodings(*, face_id, cursor):
     query = Queries.get_face_encodings.render()
     cursor.execute(query, (face_id,))
     encodings = cursor.fetchall()[0]
-    print(encodings)
     return encodings
 
 

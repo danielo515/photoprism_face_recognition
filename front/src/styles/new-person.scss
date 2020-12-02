@@ -34,4 +34,8 @@
         justify-content: flex-start;
         padding-left: 0;
     }
+    .new-person-suggestions {
+        max-height: 300px;
+        overflow-y: scroll;
+    }
 }
