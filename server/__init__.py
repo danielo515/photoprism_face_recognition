@@ -33,7 +33,6 @@ def get_person():
 
 # PAGES
 
-
 @app.route('/')
 @app.route('/unknown')
 def unknown_faces():
@@ -50,7 +49,6 @@ def unknown_faces():
 @app.route('/known_people')
 def known_faces():
     known_people = get_person().list_with_faces()
-    print(known_people)
     return render_template(
         'known_people.html.jinja',
         people=known_people['people'],
