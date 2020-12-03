@@ -1,7 +1,7 @@
 import { wire } from 'hyperhtml';
 import Button from './Button';
 import Input from './Input';
-import Modal from './modal';
+import Modal from './Modal';
 import { createPerson, getFaceMatches } from './api';
 import './styles/new-person.scss';
 import { removeSelection } from './actions';

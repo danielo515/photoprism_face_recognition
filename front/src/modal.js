@@ -8,7 +8,6 @@ export default function Modal({ onClose, content, isOpen, title = null }) {
     return render`
     <div class="modal-wrapper  ${isOpen ? '' : 'modal-closed'}" >
     <div class="modal-background" onClick=${onClose}/>
-    <div class="modal-wrapper-inner">
         <div class="modal-body">
         ${
             title &&
@@ -16,7 +15,6 @@ export default function Modal({ onClose, content, isOpen, title = null }) {
         }
         ${content}
         </div>
-    </div>
     </div>
     `;
 }

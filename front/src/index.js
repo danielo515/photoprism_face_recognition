@@ -1,5 +1,5 @@
 import { selectFace } from './actions';
-import modal from './modal';
+import modal from './Modal';
 import './styles/index.scss';
 import configPage from './configPage';
 

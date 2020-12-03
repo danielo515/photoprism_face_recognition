@@ -13,15 +13,11 @@
     background-color: rgba(0, 0, 0, 0.55);
 }
 
-.modal-wrapper-inner {
-    @apply items-center justify-center flex relative;
-}
-
 .modal-body {
     @apply rounded bg-gray-100 flex flex-col p-2;
+    position: relative;
     min-width: 200px;
     min-height: 200px;
-    max-height: 80%;
     max-width: 80%;
 }
 
