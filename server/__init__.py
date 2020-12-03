@@ -1,23 +1,21 @@
+from server.database import get_db
+import server.database as database
 from process_photos.process_photos import process
 from process_photos import process_photos
 from photo_queue import PhotoQueue
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, g
 import json
 from threading import Thread
 from flask.helpers import url_for
 from config import config
 from api import Api
-import db_setup
 import faces
 from people import People
 
 app = Flask(__name__)
+database.init_app(app)
 
-
-(cnx, cursor) = db_setup.connect(**config['db_config'])
-dict_cursor = cnx.cursor(dictionary=True)
 api = Api(config['host'])
-person = People(cnx=cnx)
 
 
 def format_faces_response(face):
@@ -27,12 +25,21 @@ def format_faces_response(face):
     return face
 
 
+def get_person():
+    db = get_db()
+    person = People(cnx=db.cnx)
+    return person
+
+
 # PAGES
+
+
 @app.route('/')
 @app.route('/unknown')
 def unknown_faces():
-    images = faces.find_unknown_in_db(cursor=cursor, api=api)
-    existing_people = person.list()
+    db = get_db()
+    images = faces.find_unknown_in_db(cursor=db.cursor, api=api)
+    existing_people = get_person().list()
     return render_template(
         'unknown_faces.html.jinja',
         images=images,
@@ -42,7 +49,7 @@ def unknown_faces():
 
 @app.route('/known_people')
 def known_faces():
-    known_people = person.list_with_faces()
+    known_people = get_person().list_with_faces()
     print(known_people)
     return render_template(
         'known_people.html.jinja',
@@ -53,6 +60,7 @@ def known_faces():
 
 @app.route('/person/<int:id>/faces')
 def known_person_faces(id):
+    person = get_person()
     faces = person.faces(id=id)
     possible_faces = person.get_potential_faces(id=id)
     person_data = person.from_db(id=id)
@@ -87,12 +95,13 @@ def config_page():
 
 @app.route('/cmd/scan', methods=['POST'])
 def start_scan():
+    db = get_db()
     if threads['photos'] == None or not threads['photos'].is_alive():
-        queue = PhotoQueue(cnx)
+        queue = PhotoQueue(db.cnx)
         queue.fill_queue()
         threads['photos'] = Thread(
             target=queue.consume,
-            kwargs=dict(process=process_photos.process(api=api, cursor=cnx.cursor()))
+            kwargs=dict(process=process_photos.process(api=api, cursor=db.cnx.cursor()))
         )
         threads['photos'].start()
         return {'result': 'Scan has started'}
@@ -110,18 +119,19 @@ def scan_status():
 def create_person():
     name = request.json.get('name')
     faces = request.json.get('faces')
-    id, faces = person.create(name=name, faces=faces)
+    id, faces = get_person().create(name=name, faces=faces)
     print("Created person with ", (id, name))
     return dict(result={'id': id, 'faces_count': faces})
 
 
 @app.route('/people')
 def list_people():
-    return {'result': person.list()}
+    return {'result': get_person().list()}
 
 
 @app.route('/people/<int:person_id>/faces', methods=['POST'])
 def assign_face_to_person(person_id):
+    person = get_person()
     faces = request.json.get('faces')
     if len(faces) > 1:
         result = person.assign_many_faces(faces=faces, person_id=person_id)
@@ -132,6 +142,7 @@ def assign_face_to_person(person_id):
 
 @app.route('/people/<int:id>/faces')
 def list_person_faces(id):
+    person = get_person()
     return {'result': {
         'id': id,
         'faces': person.faces(id=id),
@@ -141,11 +152,12 @@ def list_person_faces(id):
 
 @app.route('/faces/<int:id>/matches')
 def possible_face_matches(id):
-    face_encodings = faces.get_face_encodings(face_id=id, cursor=cursor)
+    db = get_db()
+    face_encodings = faces.get_face_encodings(face_id=id, cursor=db.cursor)
     possible_faces = faces.find_closest_match_in_db(
         face_encodings=face_encodings,
         ignore_known=True,
-        cursor=dict_cursor)
+        cursor=db.cnx.cursor(dictionary=True))
 
     return {'result': {
         'id': id,
