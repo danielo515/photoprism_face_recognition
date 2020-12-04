@@ -155,6 +155,7 @@ def possible_face_matches(id):
     possible_faces = faces.find_closest_match_in_db(
         face_encodings=face_encodings,
         ignore_known=True,
+        exclude_list=(id,),
         cursor=db.cnx.cursor(dictionary=True))
 
     return {'result': {

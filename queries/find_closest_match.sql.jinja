@@ -12,6 +12,11 @@ ON face.file_id = e.id
 {% if ignore_known %}
 WHERE face.person_id is NULL
 {% endif %}
+{% if ignore_known and exclude_list %}
+AND face.id not in ({{ exclude_list }})
+{% elif  exclude_list %}
+WHERE face.id not in ({{ exclude_list }})
+{% endif %}
 HAVING distance < 0.5 and distance > 0
 ORDER BY distance ASC
 LIMIT %(limit)s
