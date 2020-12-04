@@ -10,6 +10,17 @@ import { FacesList } from './FacesList';
 const closeModal = () =>
     Modal({ content: null, isOpen: false, onClose: () => {} });
 
+const Suggestions = ({ faces }) =>
+    wire(faces)`
+        <div class="face-suggestions">
+            <h3>Select other possible matches</h3>
+            ${Button({
+                onClick: console.log,
+                label: 'Select all',
+            })}</div>
+            ${FacesList({ faces, className: 'new-person-suggestions' })}
+        `;
+
 /**
  *
  * @param {Object} props
@@ -56,9 +67,7 @@ export default function NewPerson({ faces, isOpen }) {
             ${FacesList({ faces, className: 'faces-list' })}
     </div>
 
-        ${getFaceMatches({ id: faces[0].id }).then(({ faces }) =>
-            FacesList({ faces, className: 'new-person-suggestions' }),
-        )}
+        ${getFaceMatches({ id: faces[0].id }).then(Suggestions)}
         
     </div>
     `;

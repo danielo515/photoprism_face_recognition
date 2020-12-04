@@ -24,9 +24,9 @@
         padding-top: $p-md;
         display: flex;
         flex-direction: column;
-        h3 {
-            @extend %title-section;
-        }
+    }
+    h3 {
+        @extend %title-section;
     }
     .faces-list {
         display: flex;
@@ -37,5 +37,14 @@
     .new-person-suggestions {
         max-height: 300px;
         overflow-y: scroll;
+    }
+    .face-suggestions {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        button {
+            @apply ml-4;
+        }
     }
 }
