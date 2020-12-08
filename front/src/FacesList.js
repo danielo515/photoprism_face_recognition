@@ -7,21 +7,25 @@ import { toggleFace, isFaceSelected } from './appState';
  *
  * @param {import('./FaceBubble').BubbleEvent} e
  */
-const onBubbleClick = (e) => toggleFace(e.currentTarget.data);
+const onBubbleClick = (render) => (e) => {
+    toggleFace(e.currentTarget.data);
+    render();
+};
 
 /**
  *
- * @param {Object} param
- * @param {import('./appState').Face[]} param.faces
- * @param {string} [param.className]
+ * @param {Object} props
+ * @param {import('./appState').Face[]} props.faces
+ * @param {string} [props.className]
  */
-export function FacesList({ faces, className = '' }) {
-    return wire()`
+export function FacesList(props) {
+    const { faces, className = '' } = props;
+    return wire(faces, ':faces-list')`
     <div class="faces-list ${className}">
         ${faces.map((face) =>
             FaceBubble({
                 face,
-                onClick: onBubbleClick,
+                onClick: onBubbleClick(() => FacesList(props)),
                 isSelected: isFaceSelected(face.id),
             }),
         )}

@@ -20,6 +20,8 @@ const calculateFaceOffset = (locations, cropSize = 100) => {
  * @typedef BubbleEvent
  * @property {Object} currentTarget
  * @property {import('./appState').Face} currentTarget.data
+ * @property {object} currentTarget.classList
+ * @property {function} currentTarget.classList.toggle
  */
 /**
  *
