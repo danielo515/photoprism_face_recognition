@@ -6,6 +6,7 @@ import { createPerson, getFaceMatches } from './api';
 import './styles/new-person.scss';
 import { removeSelection } from './actions';
 import { FacesList } from './FacesList';
+import { addFaces } from './appState';
 
 const closeModal = () =>
     Modal({ content: null, isOpen: false, onClose: () => {} });
@@ -15,7 +16,7 @@ const Suggestions = ({ faces }) =>
         <div class="face-suggestions">
             <h3>Select other possible matches</h3>
             ${Button({
-                onClick: console.log,
+                onClick: () => addFaces(faces),
                 label: 'Select all',
             })}</div>
             ${FacesList({ faces, className: 'new-person-suggestions' })}

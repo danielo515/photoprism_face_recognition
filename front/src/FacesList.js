@@ -1,7 +1,13 @@
 import { FaceBubble } from './FaceBubble';
 import { wire } from 'hyperhtml';
 import './FacesList.scss';
-import { appState, isFaceSelected } from './appState';
+import { toggleFace, isFaceSelected } from './appState';
+
+/**
+ *
+ * @param {import('./FaceBubble').BubbleEvent} e
+ */
+const onBubbleClick = (e) => toggleFace(e.currentTarget.data);
 
 /**
  *
@@ -13,7 +19,11 @@ export function FacesList({ faces, className = '' }) {
     return wire()`
     <div class="faces-list ${className}">
         ${faces.map((face) =>
-            FaceBubble({ face, isSelected: isFaceSelected(face.id) }),
+            FaceBubble({
+                face,
+                onClick: onBubbleClick,
+                isSelected: isFaceSelected(face.id),
+            }),
         )}
     </div>`;
 }

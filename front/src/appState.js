@@ -58,12 +58,24 @@ export function toggleFace({ id, url, locations }) {
  * Adds a face to the list of selected ones
  * @param {Face} face
  */
-export function addFace({ id, url }) {
+export function addFace({ id, url, locations }) {
     const present = isPresent(id);
     if (present) return;
-    add(id, url);
+    add(id, url, locations);
 }
 
+/**
+ * Adds a face to the list of selected ones
+ * @param {Face[]} faces
+ */
+export function addFaces(faces) {
+    faces.forEach(addFace);
+}
+
+/**
+ * Removes a face from the list of selected ones
+ * @param {Face} face
+ */
 export function removeFace({ id }) {
     const present = isPresent(id);
     if (!present) return;

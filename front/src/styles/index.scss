@@ -13,14 +13,6 @@
     opacity: 1;
 }
 
-.selected::before {
-    color: green;
-    font-family: 'FontAwesome';
-    font-weight: 900;
-    /*content: "\f144a";*/
-    content: '\f058';
-}
-
 .grid-container {
     display: flex;
     padding: 16px;
