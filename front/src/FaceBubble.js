@@ -17,9 +17,11 @@ const calculateFaceOffset = (locations, cropSize = 100) => {
 
 /**
  *
- * @param {import('./appState').Face} face
+ * @param {Object} params
+ * @param {boolean} [ params.isSelected ]
+ * @param {import('./appState').Face} params.face
  */
-export function FaceBubble(face) {
+export function FaceBubble({ face, isSelected = false }) {
     const { id, url, locations } = face;
     const { offsetX, offsetY } = calculateFaceOffset(locations);
     const style = {
@@ -30,7 +32,7 @@ export function FaceBubble(face) {
     const view = wire(face)`
     <div class="crop-wrapper" data-id=${id}>
         <div
-            class="crop-face"
+            class="crop-face ${isSelected ? 'selected' : ''}"
             style=${style}
         >
         </div>

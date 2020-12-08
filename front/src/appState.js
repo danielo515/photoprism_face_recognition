@@ -82,6 +82,14 @@ export function listFaces() {
     }));
 }
 
+/**
+ * Tells you if certain face has been selected
+ * @param {string} faceId the face you want to check if it is selected
+ */
+export function isFaceSelected(faceId) {
+    return isPresent(faceId);
+}
+
 export function clearFaces() {
     appState.selectedFaces.list.clear();
     appState.selectedFaces.index = {};
