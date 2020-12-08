@@ -93,6 +93,10 @@ export function listFaces() {
         locations: index[id].locations,
     }));
 }
+export const listFacesIds = () => {
+    const { list } = getFaces();
+    return [...list];
+};
 
 /**
  * Tells you if certain face has been selected

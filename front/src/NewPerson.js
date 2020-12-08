@@ -6,7 +6,7 @@ import { createPerson, getFaceMatches } from './api';
 import './styles/new-person.scss';
 import { removeSelection } from './actions';
 import { FacesList } from './FacesList';
-import { addFaces } from './appState';
+import { addFaces, clearFaces, listFaces, listFacesIds } from './appState';
 
 const closeModal = () =>
     Modal({ content: null, isOpen: false, onClose: () => {} });
@@ -16,7 +16,10 @@ const Suggestions = ({ faces }) =>
         <div class="face-suggestions">
             <h3>Select other possible matches</h3>
             ${Button({
-                onClick: () => addFaces(faces),
+                onClick: () => {
+                    addFaces(faces);
+                    Suggestions({ faces });
+                },
                 label: 'Select all',
             })}</div>
             ${FacesList({ faces, className: 'new-person-suggestions' })}
@@ -33,9 +36,10 @@ export default function NewPerson({ faces, isOpen }) {
     const save = (e) => {
         const faceIds = faces.map((x) => x.id);
         e.preventDefault();
-        createPerson({ name: state.value, faces: faceIds })
+        createPerson({ name: state.value, faces: listFacesIds() })
             .then(() => {
                 removeSelection(faceIds);
+                clearFaces();
                 closeModal();
             })
             .catch(() => alert('Woops, failed'));
