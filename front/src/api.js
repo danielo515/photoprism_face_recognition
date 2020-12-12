@@ -47,3 +47,13 @@ export const getFaceMatches = async ({ id }) => {
     const { result } = await Get(`/faces/${id}/matches`);
     return result;
 };
+/**
+ * Returns a list of possible face matches from a list of faces
+ * @param {Object} param
+ * @param {string[]} param.ids the face list
+ * @returns {Promise<{faces: import("./appState").Face[]}>} a promise with the possible face matches
+ */
+export const getFacesMatches = async ({ ids }) => {
+    const { result } = await Get(`/faces-matches?id=${ids.join('&id=')}`);
+    return result;
+};

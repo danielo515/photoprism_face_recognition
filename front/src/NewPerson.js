@@ -2,7 +2,7 @@ import { wire } from 'hyperhtml';
 import Button from './Button';
 import Input from './Input';
 import Modal from './Modal';
-import { createPerson, getFaceMatches } from './api';
+import { createPerson, getFacesMatches } from './api';
 import './styles/new-person.scss';
 import { removeSelection } from './actions';
 import { FacesList } from './FacesList';
@@ -33,8 +33,8 @@ const Suggestions = ({ faces }) =>
  */
 export default function NewPerson({ faces, isOpen }) {
     const state = { value: '' };
+    const faceIds = faces.map((x) => x.id);
     const save = (e) => {
-        const faceIds = faces.map((x) => x.id);
         e.preventDefault();
         createPerson({ name: state.value, faces: listFacesIds() })
             .then(() => {
@@ -72,7 +72,7 @@ export default function NewPerson({ faces, isOpen }) {
             ${FacesList({ faces, className: 'faces-list' })}
     </div>
 
-        ${getFaceMatches({ id: faces[0].id }).then(Suggestions)}
+        ${getFacesMatches({ ids: faceIds }).then(Suggestions)}
         
     </div>
     `;
