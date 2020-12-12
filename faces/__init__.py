@@ -11,6 +11,14 @@ def get_face_encodings(*, face_id, cursor):
     return encodings
 
 
+def get_faces_encodings(*, faces_ids, cursor):
+    encodings = [
+        get_face_encodings(face_id=id, cursor=cursor)
+        for id in faces_ids
+    ]
+    return encodings
+
+
 def find_closest_match_by_id(*, face_id, cursor, limit=50):
     return find_closest_match_in_db(
         face_encodings=get_face_encodings(face_id=face_id, cursor=cursor),
@@ -26,6 +34,13 @@ def find_closest_match_in_db(*, face_encodings, cursor, ignore_known=False, limi
     )
     cursor.execute(query, {'limit': limit})
     return cursor.fetchall()
+
+
+def find_closest_matches_in_db(*, faces_encodings, cursor, ignore_known=False, limit=50, exclude_list=None):
+    result = [find_closest_match_in_db(
+        face_encodings=encodings, cursor=cursor, ignore_known=ignore_known, limit=limit, exclude_list=exclude_list)
+        for encodings in faces_encodings]
+    return result
 
 
 def find_unknown_in_db(*, cursor, api, limit=200):

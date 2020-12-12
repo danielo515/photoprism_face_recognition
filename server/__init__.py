@@ -1,4 +1,5 @@
 from server.database import get_db
+from itertools import chain
 import server.database as database
 from process_photos.process_photos import process
 from process_photos import process_photos
@@ -162,6 +163,27 @@ def possible_face_matches(id):
         'id': id,
         'faces': list(map(format_faces_response, possible_faces))
     }}
+
+
+@app.route('/faces-matches/')
+def possible_faces_matches():
+    db = get_db()
+    ids = [int(id) for id in request.args.getlist('id')]
+    print('Looking for', ids)
+    faces_encodings = faces.get_faces_encodings(
+        faces_ids=ids,
+        cursor=db.cursor)
+    possible_faces = faces.find_closest_matches_in_db(
+        faces_encodings=faces_encodings,
+        ignore_known=True,
+        exclude_list=ids,
+        cursor=db.cnx.cursor(dictionary=True))
+
+    result = list(map(
+        format_faces_response,
+        chain.from_iterable(possible_faces)))
+
+    return {'result': {'faces': result}}
 
 
 with app.test_request_context():
