@@ -5,7 +5,12 @@ INSERT into people (name)
 VALUES (%s)
 """
 
-assign = """
+delete_person = """
+DELETE FROM people
+WHERE id = %s
+"""
+
+assign_face = """
 UPDATE faces
 SET person_id = %(person_id)s
 WHERE id = %(face_id)s
@@ -73,7 +78,7 @@ class People:
         #     return -1
 
     def assign_face(self, *, face_id, person_id):
-        return {'updated': self.execute(assign, person_id=person_id, face_id=face_id).rowcount}
+        return {'updated': self.execute(assign_face, person_id=person_id, face_id=face_id).rowcount}
 
     def assign_many_faces(self, *, faces, person_id):
         self.cursor.executemany(assign_many, [(person_id, face) for face in faces])
@@ -110,3 +115,7 @@ class People:
             ignore_known=True,
             cursor=self.cursor)
         return list(map(parse_face_locations, possible_faces))
+
+    def delete(self, id: int):
+        self.cursor.execute(delete_person, (id,))
+        self.cnx.commit()

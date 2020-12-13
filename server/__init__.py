@@ -123,6 +123,12 @@ def create_person():
     return dict(result={'id': id, 'faces_count': faces})
 
 
+@app.route('/people/<int:id>', methods=['DELETE'])
+def delete_person(id):
+    get_person().delete(id)
+    return dict(result={'id': id, 'deleted': True})
+
+
 @app.route('/people')
 def list_people():
     return {'result': get_person().list()}
@@ -162,6 +168,16 @@ def possible_face_matches(id):
     return {'result': {
         'id': id,
         'faces': list(map(format_faces_response, possible_faces))
+    }}@app.route('/faces/<int:id>/matches')
+
+
+@app.route('/faces/<int:id>/person', methods=['DELETE'])
+def unasign_face(id):
+    db = get_db()
+    faces.unlink_from_person(id=id, cursor=db.cursor, cnx=db.cnx)
+    return {'result': {
+        'id': id,
+        'ok': True
     }}
 
 

@@ -74,3 +74,9 @@ def save_to_db(image_id, encodings, locations, cursor):
         cursor.execute(
             Queries.save_face,
             (image_id, json.dumps(location)) + tuple(encoding))
+
+
+def unlink_from_person(*, id: int, cursor, cnx):
+    cursor.execute('UPDATE faces SET person_id = null WHERE id = %s', (id,))
+    print(cursor.rowcount)
+    cnx.commit()

@@ -9,7 +9,7 @@ def create_connection():
     g.db = SimpleNamespace(cnx=cnx, cursor=cursor)
 
 
-def get_db():
+def get_db() -> SimpleNamespace:
     if 'db' not in g:
         create_connection()
     if(not g.db.cnx.is_connected()):

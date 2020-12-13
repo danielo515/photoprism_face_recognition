@@ -21,8 +21,8 @@ def create_faces_table():
             person_id INT(10) UNSIGNED NULL,
             locations JSON NOT NULL,
             {rows},
-            FOREIGN KEY fk (file_id) REFERENCES files (id) ON UPDATE RESTRICT,
-            FOREIGN KEY person_FK (person_id) REFERENCES people (id)
+            FOREIGN KEY fk (file_id) REFERENCES files (id),
+            FOREIGN KEY person_FK (person_id) REFERENCES people (id) ON DELETE SET NULL
         ) ENGINE = InnoDB;
     '''.format(rows=",\n".join(rows))
     return query
