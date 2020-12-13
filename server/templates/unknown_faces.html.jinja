@@ -3,7 +3,6 @@
     Identify Faces
 {% endblock title %}
 {% block head %}
-    <script src="https://unpkg.com/hyperhtml@latest/min.js"></script>
     <script>
         const server_data = JSON.parse('{{ people | tojson }}')
         window.server_data = server_data

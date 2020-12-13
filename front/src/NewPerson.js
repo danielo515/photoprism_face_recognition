@@ -11,7 +11,7 @@ import { addFaces, clearFaces, listFaces, listFacesIds } from './appState';
 const closeModal = () =>
     Modal({ content: null, isOpen: false, onClose: () => {} });
 
-const Suggestions = ({ faces }) =>
+export const Suggestions = ({ faces }) =>
     wire(faces, ':suggestions')`
         <div class="face-suggestions">
             <h3>Select other possible matches</h3>

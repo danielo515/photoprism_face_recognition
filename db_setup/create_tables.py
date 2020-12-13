@@ -22,7 +22,7 @@ def create_faces_table():
             locations JSON NOT NULL,
             {rows},
             FOREIGN KEY fk (file_id) REFERENCES files (id),
-            FOREIGN KEY person_FK (person_id) REFERENCES people (id) ON DELETE SET NULL
+            FOREIGN KEY person_fk (person_id) REFERENCES people (id) ON DELETE SET NULL
         ) ENGINE = InnoDB;
     '''.format(rows=",\n".join(rows))
     return query

@@ -25,13 +25,17 @@
 </div>
 {% endfor %}
 {% endmacro %}
+{% block head %}
+    <script>
+        window.server_data = JSON.parse('{ "faces": {{ faces | tojson }} }')
+        window.page = 'person-faces'
+    </script>
+{% endblock head %}
 {% block content %}
 <section >
     <h1>Known faces</h1>
     <div class="grid-container">{{ print_faces(faces) }}</div>
 </section>
-<section >
-    <h1>Possible matches</h1>
-    <div class="grid-container">{{ print_faces(possible_faces)}}</div>
+<section id='possible-matches'>
 </section>
 {% endblock content %}

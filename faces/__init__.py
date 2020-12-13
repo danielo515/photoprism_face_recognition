@@ -37,9 +37,12 @@ def find_closest_match_in_db(*, face_encodings, cursor, ignore_known=False, limi
 
 
 def find_closest_matches_in_db(*, faces_encodings, cursor, ignore_known=False, limit=50, exclude_list=None):
-    result = [find_closest_match_in_db(
-        face_encodings=encodings, cursor=cursor, ignore_known=ignore_known, limit=limit, exclude_list=exclude_list)
-        for encodings in faces_encodings]
+    result = []
+    for encodings in faces_encodings:
+        faces = find_closest_match_in_db(
+            face_encodings=encodings, cursor=cursor, ignore_known=ignore_known, limit=limit, exclude_list=exclude_list)
+        exclude_list = exclude_list + [f['id'] for f in faces]
+        result = result + faces
     return result
 
 

@@ -61,13 +61,11 @@ def known_faces():
 def known_person_faces(id):
     person = get_person()
     faces = person.faces(id=id)
-    possible_faces = person.get_potential_faces(id=id)
     person_data = person.from_db(id=id)
     return render_template(
         'faces.html.jinja',
         name=person_data['name'],
         faces=faces,
-        possible_faces=possible_faces,
         api=api,
         crop_size=100
     )
@@ -197,7 +195,7 @@ def possible_faces_matches():
 
     result = list(map(
         format_faces_response,
-        chain.from_iterable(possible_faces)))
+        possible_faces))
 
     return {'result': {'faces': result}}
 
