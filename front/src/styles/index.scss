@@ -9,6 +9,19 @@
     color: white;
 }
 
+h1 {
+    @extend %title-modal;
+}
+
+h2,
+h3 {
+    @extend %title-section;
+}
+
+.title {
+    @apply text-3xl text-indigo-900;
+}
+
 .crop:hover > .face-square {
     opacity: 1;
 }

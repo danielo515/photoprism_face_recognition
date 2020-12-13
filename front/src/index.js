@@ -3,7 +3,7 @@ import modal from './Modal';
 import './styles/index.scss';
 import configPage from './configPage';
 import { bind } from 'hyperhtml';
-import { Suggestions } from './NewPerson';
+import { Suggestions } from './Suggestions';
 import { getFacesMatches } from './api';
 
 window.selectFace = selectFace;

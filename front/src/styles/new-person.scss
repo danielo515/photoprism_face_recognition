@@ -38,13 +38,4 @@
         max-height: 300px;
         overflow-y: scroll;
     }
-    .face-suggestions {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: flex-start;
-        button {
-            @apply ml-4;
-        }
-    }
 }

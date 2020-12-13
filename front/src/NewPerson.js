@@ -6,24 +6,11 @@ import { createPerson, getFacesMatches } from './api';
 import './styles/new-person.scss';
 import { removeSelection } from './actions';
 import { FacesList } from './FacesList';
-import { addFaces, clearFaces, listFaces, listFacesIds } from './appState';
+import { clearFaces, listFaces, listFacesIds } from './appState';
+import { Suggestions } from './Suggestions';
 
 const closeModal = () =>
     Modal({ content: null, isOpen: false, onClose: () => {} });
-
-export const Suggestions = ({ faces }) =>
-    wire(faces, ':suggestions')`
-        <div class="face-suggestions">
-            <h3>Select other possible matches</h3>
-            ${Button({
-                onClick: () => {
-                    addFaces(faces);
-                    Suggestions({ faces });
-                },
-                label: 'Select all',
-            })}</div>
-            ${FacesList({ faces, className: 'new-person-suggestions' })}
-        `;
 
 /**
  *
